@@ -4,7 +4,7 @@ USER root
 
 RUN pip3 install -r requirements.txt
 
-COPY requirements.txt requirements.txt
+COPY requirements.txt ./
 COPY --chown=airflow:root ./dags/ ${AIRFLOW_HOME}/dags/
 
 USER airflow
