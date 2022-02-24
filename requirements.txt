@@ -1,2 +1,3 @@
 redis
 apache-airflow
+elasticsearch
