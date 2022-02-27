@@ -1,3 +1,4 @@
-redis
+redis~=4.1.4
 apache-airflow
-elasticsearch
+elasticsearch~=8.0.0
+pendulum~=2.1.2
