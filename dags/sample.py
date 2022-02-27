@@ -230,7 +230,6 @@ if k8s:
 
         (
             start_task()
-            >> [volume_task, other_ns_task, sidecar_task]
             >> third_task
             >> [base_image_task, four_task]
         )
