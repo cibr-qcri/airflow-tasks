@@ -71,6 +71,6 @@ with DAG(
                            sniff_on_start=True)
         r = redis.Redis(host=redis_conn.host, port=redis_conn.port, db=0)
 
-        #clear_queues(r)
+        clear_queues(r)
         domains = get_domains(es)
         add_start_urls(r, domains)
