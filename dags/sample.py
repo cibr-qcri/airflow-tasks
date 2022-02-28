@@ -40,7 +40,7 @@ except ImportError:
         "The example_kubernetes_executor example DAG requires the kubernetes provider."
         " Please install it with: pip install apache-airflow[cncf.kubernetes]"
     )
-    k8s = None
+    k8s = Nonec
 
 if k8s:
     with DAG(

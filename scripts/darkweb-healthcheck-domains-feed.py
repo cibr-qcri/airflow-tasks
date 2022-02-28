@@ -57,7 +57,7 @@ def get_domains(conn):
 
 
 with DAG(
-        dag_id='darkweb-healthcheck-domains-feed',
+        dag_id='scripts',
         schedule_interval='@daily',
         catchup=False,
         tags=['darkweb', 'healthcheck'],
