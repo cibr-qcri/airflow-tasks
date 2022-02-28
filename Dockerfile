@@ -1,10 +1,12 @@
-FROM apache/airflow:2.0.2
+FROM python:3.8
 
-USER root
+ARG modified_file
+
+WORKDIR /usr/src/job
 
 COPY requirements.txt ./
-COPY --chown=airflow:root ./dags/ ${AIRFLOW_HOME}/dags/
+COPY $modified_file ./script.py
 
 RUN pip3 install -r requirements.txt
 
-USER airflow
+CMD [ "python3", "script.py" ]
