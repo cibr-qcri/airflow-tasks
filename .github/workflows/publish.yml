@@ -28,7 +28,9 @@ jobs:
             if [[ $changed_file == scripts* ]] ;
             then
               file_segments=(${IN//\// })
-              docker build --build-arg modified_file=$changed_file -t "${ file_segments[1] }:latest"
+              echo ${file_segments[0]}
+              echo ${file_segments[1]}
+              docker build --build-arg modified_file=$changed_file -t "${file_segments[1]}:latest"
             fi
           done
           docker images
