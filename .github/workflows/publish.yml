@@ -21,9 +21,11 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
       - name: Get changed file
+        id: feth-changed-files
         run: echo ::set-output modified_files="$(git diff --name-only ${{ github.event.before }}..${{ github.event.after }})"
       - name: Build & Push Containers to DockerHub
         id: docker_build
         shell: bash
         run: |
           ls
+          echo ${{ steps.feth-changed-files.outputs.modified_files }}
