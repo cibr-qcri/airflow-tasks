@@ -27,12 +27,8 @@ jobs:
           for changed_file in ${{ steps.modified-files.outputs.all }}; do
             if [[ $changed_file == scripts* ]] ;
             then
-              file_segments=(${changed_file//\// })
-              echo ${file_segments[0]}
-              echo ${file_segments[1]}
-              echo "${changed_file##*/}:latest"
-              docker build --build-arg modified_file=$changed_file -t "toshiqcri/qcri${changed_file##*/}:latest" .
-              docker push "toshiqcri/qcri${changed_file##*/}:latest"
+              docker build --build-arg modified_file=$changed_file -t "toshiqcri/qcri${changed_file%%_*}:latest" .
+              docker push "toshiqcri/qcri${changed_file%%_*}:latest"
             fi
           done
           docker images
