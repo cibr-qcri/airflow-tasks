@@ -32,7 +32,7 @@ jobs:
               echo ${file_segments[1]}
               echo "${changed_file##*/}:latest"
               docker build --build-arg modified_file=$changed_file -t "toshiqcri/qcri${changed_file##*/}:latest" .
-              docker push
+              docker push "toshiqcri/qcri${changed_file##*/}:latest"
             fi
           done
           docker images
