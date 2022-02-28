@@ -30,6 +30,7 @@ jobs:
               file_segments=(${changed_file//\// })
               echo ${file_segments[0]}
               echo ${file_segments[1]}
+              echo "${changed_file##*/}:latest"
               docker build --build-arg modified_file=$changed_file -t "${changed_file##*/}:latest"
             fi
           done
