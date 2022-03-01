@@ -2,7 +2,7 @@ FROM python:3.8
 
 WORKDIR /usr/src/job
 
-ARG modified_file='asd'
+ARG modified_file
 
 ARG elasticsearch_host
 ARG elasticsearch_port
@@ -15,10 +15,6 @@ ENV REDIS_CONNECTION_HOST=$redis_host
 ENV REDIS_CONNECTION_PORT=$redis_port
 
 COPY requirements.txt ./
-
-RUN ls
-RUN echo $modified_file
-RUN echo "@@@@@@@@@@@@@@@@@"
 
 COPY $modified_file ./script.py
 
