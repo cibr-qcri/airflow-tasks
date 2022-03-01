@@ -2,6 +2,11 @@ name: Publish
 on:
   push:
     branches: [ main ]
+env:
+  es_host: ${{ secrets.ES_CONNECTION_HOST }}
+  es_port: ${{ secrets.ES_CONNECTION_PORT }}
+  redis_host: ${{ secrets.CRAWLERS_REDIS_CONNECTION_HOST }}
+  redis_port: ${{ secrets.CRAWLERS_REDIS_CONNECTION_PORT }}
 jobs:
   push_to_registry:
     name: Push Docker image to Docker Hub
@@ -28,7 +33,14 @@ jobs:
             if [[ $changed_file == scripts* ]] ;
             then
               file=${changed_file##*/}
-              docker build --build-arg modified_file=$changed_file -t "toshiqcri/${file%%_*}:latest" .
+              docker build \
+                --build-arg modified_file=$changed_file \
+                --build-arg elasticsearch_host=$es_host \
+                --build-arg elasticsearch_port=$es_port \
+                --build-arg redis_host=$redis_host \
+                --build-arg redis_port=$redis_port \
+                -t "toshiqcri/${file%%_*}:latest" .
+
               docker push "toshiqcri/${file%%_*}:latest"
             fi
           done

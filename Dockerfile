@@ -1,8 +1,17 @@
+ARG modified_file
+ARG elasticsearch_host
+ARG elasticsearch_port
+ARG redis_host
+ARG redis_port
+
 FROM python:3.8
 
-ARG modified_file
-
 WORKDIR /usr/src/job
+
+ENV ES_CONNECTION_HOST=$elasticsearch_host
+ENV ES_CONNECTION_PORT=$elasticsearch_port
+ENV REDIS_CONNECTION_HOST=$redis_host
+ENV REDIS_CONNECTION_PORT=$redis_port
 
 COPY requirements.txt ./
 COPY $modified_file ./script.py

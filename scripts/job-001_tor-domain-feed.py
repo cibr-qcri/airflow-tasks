@@ -1,7 +1,6 @@
+import os
+
 import redis
-from airflow import DAG
-from airflow.decorators import task
-from airflow.hooks.base import BaseHook
 from elasticsearch import Elasticsearch
 
 
@@ -56,21 +55,15 @@ def get_domains(conn):
     return [unify(domain) for domain in results]
 
 
-with DAG(
-        dag_id='scripts',
-        schedule_interval='@daily',
-        catchup=False,
-        tags=['darkweb', 'healthcheck'],
-) as dag:
-    @task(task_id="push-domains")
-    def push_domains():
-        es_conn = BaseHook.get_connection("elasticsearch")
-        redis_conn = BaseHook.get_connection("crawlers-redis")
+if __name__ == "__main__":
+    es_host = os.getenv('ES_CONNECTION_HOST')
+    es_port = os.getenv('ES_CONNECTION_PORT')
+    redis_host = os.getenv('REDIS_CONNECTION_HOST')
+    redis_port = os.getenv('REDIS_CONNECTION_PORT')
 
-        es = Elasticsearch([f"{es_conn.host}:{es_conn.port}"], timeout=50, max_retries=10, retry_on_timeout=True,
-                           sniff_on_start=True)
-        r = redis.Redis(host=redis_conn.host, port=redis_conn.port, db=0)
+    es = Elasticsearch([f"{es_host}:{es_port}"], timeout=50, max_retries=10, retry_on_timeout=True)
+    r = redis.Redis(host=redis_host, port=redis_port, db=0)
 
-        #clear_queues(r)
-        domains = get_domains(es)
-        add_start_urls(r, domains)
+    clear_queues(r)
+    domains = get_domains(es)
+    add_start_urls(r, domains)
