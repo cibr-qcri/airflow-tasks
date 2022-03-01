@@ -40,7 +40,8 @@ jobs:
                 --build-arg elasticsearch_port=$es_port \
                 --build-arg redis_host=$redis_host \
                 --build-arg redis_port=$redis_port \
-                -t "toshiqcri/${file%%_*}:latest" .
+                -t "toshiqcri/${file%%_*}:latest" \
+                --no-cache .
 
               docker push "toshiqcri/${file%%_*}:latest"
             fi
