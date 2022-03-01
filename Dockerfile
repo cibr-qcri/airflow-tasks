@@ -1,4 +1,4 @@
-ARG modified_file
+ARG modified_file='asd'
 
 ARG elasticsearch_host
 ARG elasticsearch_port
@@ -18,6 +18,7 @@ COPY requirements.txt ./
 
 RUN ls
 RUN echo $modified_file
+RUN echo modified_file
 RUN echo "@@@@@@@@@@@@@@@@@"
 
 COPY $modified_file ./script.py
