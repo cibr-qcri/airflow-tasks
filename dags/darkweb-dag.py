@@ -7,8 +7,8 @@ from airflow.providers.cncf.kubernetes.operators.kubernetes_pod import Kubernete
 YESTERDAY = datetime.datetime.now() - datetime.timedelta(days=1)
 
 with models.DAG(
-        dag_id='darkweb-dags',
-        schedule_interval=datetime.timedelta(days=1),
+        dag_id='darkweb-hourly-dags',
+        schedule_interval='@hourly',
         start_date=YESTERDAY) as dag:
 
     k = KubernetesPodOperator(
@@ -17,5 +17,5 @@ with models.DAG(
         image_pull_policy='Always',
         namespace='airflow',
         task_id="tor-healthcheck-domain-feed",
-        do_xcom_push=True,
+        do_xcom_push=False,
     )
