@@ -15,6 +15,7 @@ with models.DAG(
         name="tor-healthcheck-domain-feed",
         image='toshiqcri/job-001:latest',
         image_pull_policy='Always',
+        namespace='default',
         task_id="tor-healthcheck-domain-feed",
         do_xcom_push=True,
     )
