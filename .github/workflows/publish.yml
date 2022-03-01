@@ -35,7 +35,7 @@ jobs:
               file=${changed_file##*/}
               echo "changed_file=$changed_file"
               docker build \
-                --build-arg modified_file=${changed_file} \
+                --build-arg modified_file="$changed_file" \
                 --build-arg elasticsearch_host=$es_host \
                 --build-arg elasticsearch_port=$es_port \
                 --build-arg redis_host=$redis_host \
