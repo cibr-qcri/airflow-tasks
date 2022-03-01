@@ -1,4 +1,5 @@
 ARG modified_file
+
 ARG elasticsearch_host
 ARG elasticsearch_port
 ARG redis_host
@@ -17,9 +18,7 @@ COPY requirements.txt ./
 
 RUN ls
 RUN echo $modified_file
-RUN echo $ES_CONNECTION_HOST
-RUN echo $REDIS_CONNECTION_HOST
-
+RUN echo "@@@@@@@@@@@@@@@@@"
 
 COPY $modified_file ./script.py
 
