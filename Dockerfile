@@ -14,6 +14,13 @@ ENV REDIS_CONNECTION_HOST=$redis_host
 ENV REDIS_CONNECTION_PORT=$redis_port
 
 COPY requirements.txt ./
+
+RUN ls
+RUN echo $modified_file
+RUN echo $ES_CONNECTION_HOST
+RUN echo $REDIS_CONNECTION_HOST
+
+
 COPY $modified_file ./script.py
 
 RUN pip3 install -r requirements.txt
