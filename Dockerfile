@@ -1,13 +1,13 @@
+FROM python:3.8
+
+WORKDIR /usr/src/job
+
 ARG modified_file='asd'
 
 ARG elasticsearch_host
 ARG elasticsearch_port
 ARG redis_host
 ARG redis_port
-
-FROM python:3.8
-
-WORKDIR /usr/src/job
 
 ENV ES_CONNECTION_HOST=$elasticsearch_host
 ENV ES_CONNECTION_PORT=$elasticsearch_port
@@ -18,7 +18,6 @@ COPY requirements.txt ./
 
 RUN ls
 RUN echo $modified_file
-RUN echo modified_file
 RUN echo "@@@@@@@@@@@@@@@@@"
 
 COPY $modified_file ./script.py
