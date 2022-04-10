@@ -1,5 +1,4 @@
 import time
-import logging
 import psycopg2
 from psycopg2 import Error
 from pathlib import Path
@@ -48,10 +47,10 @@ def main():
         connects_to_greenplum()
     
     query = "SELECT id, tx_hash, address, tx_value from btc_tx_input where id > {} and id <= {} order by id asc;".format(0, 10)
-    logging.info(query)
+    print(query)
     tx_inputs = execute_sql_query(query)
     fetched_tx_count = len(tx_inputs)
-    logging.info(fetched_tx_count)
+    print(fetched_tx_count)
 
     time.sleep(120)
 

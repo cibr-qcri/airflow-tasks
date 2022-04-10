@@ -9,6 +9,7 @@ ARG elasticsearch_port
 ARG redis_host
 ARG redis_port
 
+ENV PYTHONUNBUFFERED=1
 ENV ES_CONNECTION_HOST=$elasticsearch_host
 ENV ES_CONNECTION_PORT=$elasticsearch_port
 ENV REDIS_CONNECTION_HOST=$redis_host
