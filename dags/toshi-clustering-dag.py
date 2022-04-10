@@ -9,7 +9,7 @@ YESTERDAY = datetime.datetime.now() - datetime.timedelta(days=1)
 
 volume_mount = VolumeMount(
     'toshi-airflow-pvc',
-    mount_path='/tmp/toshi/cluster-data',
+    mount_path='/usr/src/job',
     sub_path=None,
     read_only=False
 )
@@ -28,8 +28,8 @@ default_dag_args = {
     'start_date': YESTERDAY,
     'email_on_failure': False,
     'email_on_retry': False,
-    'retries': 1,
-    'retry_delay': datetime.timedelta(minutes=5),
+    'retries': 0,
+    'retry_delay': datetime.timedelta(minutes=1),
     'on_failure_callback': failure_end_job
 }
 
