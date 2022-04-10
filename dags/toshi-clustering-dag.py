@@ -47,7 +47,7 @@ with models.DAG(
         do_xcom_push=False,
         volumes=[volume],
         volume_mounts=[volume_mount],
-        is_delete_operator_pod=True
+        is_delete_operator_pod=False
     )
 
 task_clustering
