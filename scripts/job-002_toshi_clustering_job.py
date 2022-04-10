@@ -1,10 +1,6 @@
 import psycopg2
 from psycopg2 import Error
-import uuid
-import pickle
 from pathlib import Path
-import sys
-import csv
 
 gp_connection = None
 gp_cursor = None
