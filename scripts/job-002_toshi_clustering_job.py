@@ -1,3 +1,4 @@
+import time
 import psycopg2
 from psycopg2 import Error
 from pathlib import Path
@@ -50,6 +51,8 @@ def main():
     tx_inputs = execute_sql_query(query)
     fetched_tx_count = len(tx_inputs)
     print(fetched_tx_count)
+
+    time.sleep(120)
 
 if __name__ == "__main__":
     main()

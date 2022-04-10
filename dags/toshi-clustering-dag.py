@@ -2,7 +2,6 @@ import datetime
 
 from airflow import models
 from airflow.providers.cncf.kubernetes.operators.kubernetes_pod import KubernetesPodOperator
-from airflow.operators.python import PythonOperator
 
 YESTERDAY = datetime.datetime.now() - datetime.timedelta(days=1)
 
