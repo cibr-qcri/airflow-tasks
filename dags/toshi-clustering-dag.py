@@ -8,7 +8,7 @@ from airflow.kubernetes.volume_mount import VolumeMount
 YESTERDAY = datetime.datetime.now() - datetime.timedelta(days=1)
 
 volume_mount = VolumeMount(
-    'toshi-clustering-mount',
+    'toshi-airflow-pvc',
     mount_path='/tmp/toshi/cluster-data',
     sub_path=None,
     read_only=False
@@ -16,10 +16,10 @@ volume_mount = VolumeMount(
 
 volume_config = {
     'persistentVolumeClaim':{
-        'claimName': 'toshi-clustering-mount'
+        'claimName': 'toshi-airflow-pvc'
     }
 }
-volume = Volume(name='toshi-clustering-mount', configs=volume_config)
+volume = Volume(name='toshi-airflow-pvc', configs=volume_config)
 
 def failure_end_job():
     print("Toshi clustering job failed")
