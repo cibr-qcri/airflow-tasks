@@ -1,3 +1,4 @@
+import sys
 import time
 import psycopg2
 from psycopg2 import Error
@@ -53,6 +54,8 @@ def main():
     print(fetched_tx_count)
 
     time.sleep(120)
+    sys.exit('My error message')
+    
 
 if __name__ == "__main__":
     main()

@@ -5,12 +5,16 @@ from airflow.providers.cncf.kubernetes.operators.kubernetes_pod import Kubernete
 
 YESTERDAY = datetime.datetime.now() - datetime.timedelta(days=1)
 
+def failure_end_job():
+    print("Toshi clustering failed")
+
 default_dag_args = {
     'start_date': YESTERDAY,
     'email_on_failure': False,
     'email_on_retry': False,
     'retries': 1,
-    'retry_delay': datetime.timedelta(minutes=5)
+    'retry_delay': datetime.timedelta(minutes=5),
+    'on_failure_callback': failure_end_job
 }
 
 with models.DAG(
@@ -29,3 +33,4 @@ with models.DAG(
     )
 
 task_clustering
+
