@@ -19,10 +19,6 @@ with models.DAG(
         schedule_interval='@daily',
         default_args=default_dag_args) as dag:
 
-    task_start = PythonOperator(
-        task_id="start_job",
-        python_callable=start_job)
-
     task_clustering = KubernetesPodOperator(
         name="toshi_clustering_job",
         image='toshiqcri/job-002:latest',
