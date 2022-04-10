@@ -165,7 +165,6 @@ def clear_data():
     wallet_temp_map.clear()
 
 def main():
-    print("started")
     # read previous run wallet metadata
     global last_processed_input_id
     global last_processed_tx_hash
@@ -186,6 +185,8 @@ def main():
         wallet_temp_map = load_wallet_data('wallet_temp_map')
         print('Loaded {0} wallet_temp_map entries to the memory'.format(len(wallet_temp_map)))
 
+    if not gp_connection or not gp_cursor:
+        connects_to_greenplum()
 
     # process clustering
     print("Script started to process input address id range: {} to {}".format(last_processed_input_id, last_processed_input_id + processing_row_count))
