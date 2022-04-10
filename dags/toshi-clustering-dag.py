@@ -25,6 +25,7 @@ with models.DAG(
         namespace='airflow-cluster',
         task_id="toshi_clustering_job",
         do_xcom_push=False,
+        is_delete_operator_pod=True
     )
 
 task_clustering
