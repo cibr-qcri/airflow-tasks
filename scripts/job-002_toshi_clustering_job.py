@@ -118,34 +118,34 @@ def multi_address__clustering_heuristic():
 
 def save_wallet_data():
     print("file saving")
-    with open('address_wallet_map.pickle', 'wb') as f:
+    with open('/opt/airflow/dags/address_wallet_map.pickle', 'wb') as f:
         pickle.dump(address_wallet_map, f, pickle.HIGHEST_PROTOCOL)
 
-    with open('wallet_to_wallet_map.pickle', 'wb') as f:
+    with open('/opt/airflow/dags/wallet_to_wallet_map.pickle', 'wb') as f:
         pickle.dump(wallet_to_wallet_map, f, pickle.HIGHEST_PROTOCOL)
 
-    with open('wallet_temp_map.pickle', 'wb') as f:
+    with open('/opt/airflow/dags/wallet_temp_map.pickle', 'wb') as f:
         pickle.dump(wallet_temp_map, f, pickle.HIGHEST_PROTOCOL) 
     
     last_processed_input_data_map = dict()
     last_processed_input_data_map['last_id'] = last_processed_input_id
     last_processed_input_data_map['last_tx_hash'] = last_processed_tx_hash
     last_processed_input_data_map['last_tx_wallet_id'] = last_processed_tx_wallet_id
-    with open('last_processed_input_data.pickle', 'wb') as f:
+    with open('/opt/airflow/dags/last_processed_input_data.pickle', 'wb') as f:
         pickle.dump(last_processed_input_data_map, f, pickle.HIGHEST_PROTOCOL)
 
-    if os.path.isfile('address_wallet_map.pickle'):
+    if os.path.isfile('/opt/airflow/dags/address_wallet_map.pickle'):
         print("File exists address_wallet_map.pickle")
-        fpath = os.path.abspath('address_wallet_map.pickle')
+        fpath = os.path.abspath('/opt/airflow/dags/address_wallet_map.pickle')
         print(fpath)
 
-    if os.path.isfile('last_processed_input_data.pickle'):
+    if os.path.isfile('/opt/airflow/dags/last_processed_input_data.pickle'):
         print("File exists")
-        fpath = os.path.abspath('last_processed_input_data.pickle')
+        fpath = os.path.abspath('/opt/airflow/dags/last_processed_input_data.pickle')
         print(fpath)
 
 def load_wallet_data(dict_name):
-    wallet_file = Path(dict_name + ".pickle")
+    wallet_file = Path("/opt/airflow/dags/" + dict_name + ".pickle")
     if wallet_file.exists():
         with open(dict_name + '.pickle', 'rb') as f:
             return pickle.load(f)
@@ -154,7 +154,7 @@ def load_wallet_data(dict_name):
 
 def load_last_processed_input_metadata():
     try:
-        if Path("last_processed_input_data.pickle").exists():
+        if Path("/opt/airflow/dags/last_processed_input_data.pickle").exists():
             last_processed_input_data_map = load_wallet_data('last_processed_input_data')
             last_processed_input_id = last_processed_input_data_map['last_id']
             last_processed_tx_hash = last_processed_input_data_map['last_tx_hash']
