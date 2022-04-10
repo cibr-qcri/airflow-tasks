@@ -2,11 +2,27 @@ import datetime
 
 from airflow import models
 from airflow.providers.cncf.kubernetes.operators.kubernetes_pod import KubernetesPodOperator
+from airflow.kubernetes.volume import Volume
+from airflow.kubernetes.volume_mount import VolumeMount
 
 YESTERDAY = datetime.datetime.now() - datetime.timedelta(days=1)
 
+volume_mount = VolumeMount(
+    'toshi-clustering-mount',
+    mount_path='/tmp/toshi/cluster-data',
+    sub_path=None,
+    read_only=False
+)
+
+volume_config = {
+    'persistentVolumeClaim':{
+        'claimName': 'toshi-clustering-mount'
+    }
+}
+volume = Volume(name='toshi-clustering-mount', configs=volume_config)
+
 def failure_end_job():
-    print("Toshi clustering failed")
+    print("Toshi clustering job failed")
 
 default_dag_args = {
     'start_date': YESTERDAY,
@@ -29,6 +45,8 @@ with models.DAG(
         namespace='airflow-cluster',
         task_id="toshi_clustering_job",
         do_xcom_push=False,
+        volumes=[volume],
+        volume_mounts=[volume_mount],
         is_delete_operator_pod=True
     )
 
