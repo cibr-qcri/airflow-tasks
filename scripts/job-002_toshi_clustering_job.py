@@ -55,7 +55,7 @@ def multi_address__clustering_heuristic():
     global last_processed_tx_hash
     global last_processed_tx_wallet_id
 
-    total_addresses = execute_sql_query("SELECT max(id) from btc_tx_input;")
+    #total_addresses = execute_sql_query("SELECT max(id) from btc_tx_input;")
     start_index = 0
     end_index = last_processed_input_id + 100
 
@@ -116,6 +116,7 @@ def multi_address__clustering_heuristic():
         start_index = start_index + processing_row_count
 
 def save_wallet_data():
+    print("file saving")
     with open('address_wallet_map.pickle', 'wb') as f:
         pickle.dump(address_wallet_map, f, pickle.HIGHEST_PROTOCOL)
 
