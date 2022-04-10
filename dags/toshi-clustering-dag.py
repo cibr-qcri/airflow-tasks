@@ -9,8 +9,8 @@ YESTERDAY = datetime.datetime.now() - datetime.timedelta(days=1)
 
 volume_mount = VolumeMount(
     'toshi-airflow-pvc',
-    mount_path='/opt/airflow/dags',
-    sub_path='/clustering',
+    mount_path='/opt/airflow/dags/',
+    sub_path=None,
     read_only=False
 )
 
