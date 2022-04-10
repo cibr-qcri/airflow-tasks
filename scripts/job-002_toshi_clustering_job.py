@@ -5,6 +5,7 @@ import uuid
 import pickle
 from pathlib import Path
 import os
+import glob
 
 gp_connection = None
 gp_cursor = None
@@ -147,7 +148,7 @@ def save_wallet_data():
 def load_wallet_data(dict_name):
     wallet_file = Path("/opt/airflow/dags/" + dict_name + ".pickle")
     if wallet_file.exists():
-        with open(dict_name + '.pickle', 'rb') as f:
+        with open("/opt/airflow/dags/" + dict_name + '.pickle', 'rb') as f:
             return pickle.load(f)
     else:
         return dict()  
@@ -177,6 +178,7 @@ def clear_data():
     wallet_temp_map.clear()
 
 def main():
+    print(glob.glob("/opt/airflow/dags/*"))
     # read previous run wallet metadata
     global last_processed_input_id
     global last_processed_tx_hash
