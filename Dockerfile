@@ -1,6 +1,6 @@
 FROM python:3.8
 
-WORKDIR /usr/src/job
+WORKDIR /opt/airflow/dags
 
 ARG modified_file
 
