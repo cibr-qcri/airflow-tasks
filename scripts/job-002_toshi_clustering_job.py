@@ -4,6 +4,7 @@ from psycopg2 import Error
 import uuid
 import pickle
 from pathlib import Path
+import os
 
 gp_connection = None
 gp_cursor = None
@@ -132,6 +133,16 @@ def save_wallet_data():
     last_processed_input_data_map['last_tx_wallet_id'] = last_processed_tx_wallet_id
     with open('last_processed_input_data.pickle', 'wb') as f:
         pickle.dump(last_processed_input_data_map, f, pickle.HIGHEST_PROTOCOL)
+
+    if os.path.isfile('address_wallet_map.pickle'):
+        print("File exists address_wallet_map.pickle")
+        fpath = os.path.abspath('address_wallet_map.pickle')
+        print(fpath)
+
+    if os.path.isfile('last_processed_input_data.pickle'):
+        print("File exists")
+        fpath = os.path.abspath('last_processed_input_data.pickle')
+        print(fpath)
 
 def load_wallet_data(dict_name):
     wallet_file = Path(dict_name + ".pickle")
