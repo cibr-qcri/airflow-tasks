@@ -1,12 +1,17 @@
 name: Publish
 on:
   push:
-    branches: [ main ]
+    branches: [main]
 env:
   es_host: ${{ secrets.ES_CONNECTION_HOST }}
   es_port: ${{ secrets.ES_CONNECTION_PORT }}
   redis_host: ${{ secrets.CRAWLERS_REDIS_CONNECTION_HOST }}
   redis_port: ${{ secrets.CRAWLERS_REDIS_CONNECTION_PORT }}
+  gp_host: ${{ secrets.GP_CONNECTION_HOST }}
+  gp_port: ${{ secrets.GP_CONNECTION_PORT }}
+  gp_username: ${{ secrets.GP_CONNECTION_USERNAME }}
+  gp_password: ""
+  gp_db: ${{ secrets.GP_CONNECTION_DB }}
 jobs:
   push_to_registry:
     name: Push Docker image to Docker Hub
@@ -40,6 +45,11 @@ jobs:
                 --build-arg elasticsearch_port=$es_port \
                 --build-arg redis_host=$redis_host \
                 --build-arg redis_port=$redis_port \
+                --build-arg gp_host=$gp_host \
+                --build-arg gp_port=$gp_port \
+                --build-arg gp_username=$gp_username \
+                --build-arg gp_password=$gp_password \
+                --build-arg gp_db=$gp_db \
                 -t "toshiqcri/${file%%_*}:latest" \
                 --no-cache .
 

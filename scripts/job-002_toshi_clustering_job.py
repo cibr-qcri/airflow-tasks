@@ -13,6 +13,7 @@ last_processed_input_id = 0
 processing_row_count = 100
 last_processed_tx_hash = None
 last_processed_tx_wallet_id = None
+volume_mount_path = '/opt/airflow/dags/'
 
 # Data structures for heuristic-1 clustering
 address_wallet_map = dict()
@@ -20,15 +21,16 @@ wallet_to_wallet_map = dict()
 wallet_final_state_map = dict()
 wallet_temp_map = dict()
 
+
 def connects_to_greenplum():
     try:
         # Connect to an existing database
         global gp_connection
-        gp_connection = psycopg2.connect(user="gpadmin",
-                                    password="",
-                                    host="10.4.8.131",
-                                    port="5432",
-                                    database="btc_blockchain")
+        gp_connection = psycopg2.connect(user=os.getenv('GREENPLUM_USERNAME'),
+                                    password=os.getenv('GREENPLUM_PASSWORD'),
+                                    host=os.getenv('GREENPLUM_HOST'),
+                                    port=os.getenv('GREENPLUM_PORT'),
+                                    database=os.getenv('GREENPLUM_DB'))
 
         # Create a cursor to perform database operations
         global gp_cursor
@@ -119,43 +121,33 @@ def multi_address__clustering_heuristic():
 
 def save_wallet_data():
     print("file saving")
-    with open('/opt/airflow/dags/address_wallet_map.pickle', 'wb') as f:
+    with open(volume_mount_path + 'address_wallet_map.pickle', 'wb') as f:
         pickle.dump(address_wallet_map, f, pickle.HIGHEST_PROTOCOL)
 
-    with open('/opt/airflow/dags/wallet_to_wallet_map.pickle', 'wb') as f:
+    with open(volume_mount_path + 'wallet_to_wallet_map.pickle', 'wb') as f:
         pickle.dump(wallet_to_wallet_map, f, pickle.HIGHEST_PROTOCOL)
 
-    with open('/opt/airflow/dags/wallet_temp_map.pickle', 'wb') as f:
+    with open(volume_mount_path + 'wallet_temp_map.pickle', 'wb') as f:
         pickle.dump(wallet_temp_map, f, pickle.HIGHEST_PROTOCOL) 
     
     last_processed_input_data_map = dict()
     last_processed_input_data_map['last_id'] = last_processed_input_id
     last_processed_input_data_map['last_tx_hash'] = last_processed_tx_hash
     last_processed_input_data_map['last_tx_wallet_id'] = last_processed_tx_wallet_id
-    with open('/opt/airflow/dags/last_processed_input_data.pickle', 'wb') as f:
+    with open(volume_mount_path + 'last_processed_input_data.pickle', 'wb') as f:
         pickle.dump(last_processed_input_data_map, f, pickle.HIGHEST_PROTOCOL)
 
-    if os.path.isfile('/opt/airflow/dags/address_wallet_map.pickle'):
-        print("File exists address_wallet_map.pickle")
-        fpath = os.path.abspath('/opt/airflow/dags/address_wallet_map.pickle')
-        print(fpath)
-
-    if os.path.isfile('/opt/airflow/dags/last_processed_input_data.pickle'):
-        print("File exists")
-        fpath = os.path.abspath('/opt/airflow/dags/last_processed_input_data.pickle')
-        print(fpath)
-
 def load_wallet_data(dict_name):
-    wallet_file = Path("/opt/airflow/dags/" + dict_name + ".pickle")
+    wallet_file = Path(volume_mount_path + dict_name + ".pickle")
     if wallet_file.exists():
-        with open("/opt/airflow/dags/" + dict_name + '.pickle', 'rb') as f:
+        with open(volume_mount_path + dict_name + '.pickle', 'rb') as f:
             return pickle.load(f)
     else:
         return dict()  
 
 def load_last_processed_input_metadata():
     try:
-        if Path("/opt/airflow/dags/last_processed_input_data.pickle").exists():
+        if Path(volume_mount_path + "last_processed_input_data.pickle").exists():
             last_processed_input_data_map = load_wallet_data('last_processed_input_data')
             last_processed_input_id = last_processed_input_data_map['last_id']
             last_processed_tx_hash = last_processed_input_data_map['last_tx_hash']
@@ -178,7 +170,6 @@ def clear_data():
     wallet_temp_map.clear()
 
 def main():
-    print(glob.glob("/opt/airflow/dags/*"))
     # read previous run wallet metadata
     global last_processed_input_id
     global last_processed_tx_hash
