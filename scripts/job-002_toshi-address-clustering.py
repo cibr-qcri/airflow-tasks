@@ -120,7 +120,6 @@ def multi_address__clustering_heuristic():
         start_index = start_index + processing_row_count
 
 def save_wallet_data():
-    print("file saving")
     with open(volume_mount_path + 'address_wallet_map.pickle', 'wb') as f:
         pickle.dump(address_wallet_map, f, pickle.HIGHEST_PROTOCOL)
 
@@ -200,7 +199,6 @@ def main():
     # close arangodb connection
     close_gp_connection()
 
-    print("saved")
     # save wallet maps in file system
     save_wallet_data()
 
