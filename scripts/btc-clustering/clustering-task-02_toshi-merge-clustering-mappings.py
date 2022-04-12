@@ -67,6 +67,8 @@ def load_wallet_data(dict_name):
     else:
         if dict_name != 'wallet_final_state_map':
             sys.exit(dict_name + " file can not be non exists")
+        else:
+            return dict()
 
 def execute_sql_query(query):
     gp_cursor.execute(query)
