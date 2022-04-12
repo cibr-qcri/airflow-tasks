@@ -68,20 +68,6 @@ def load_wallet_data(dict_name):
         if dict_name != 'wallet_final_state_map':
             sys.exit(dict_name + " file can not be non exists")
 
-def load_last_processed_input_metadata():
-    try:
-        if Path(volume_mount_path + "last_processed_input_data.pickle").exists():
-            last_processed_input_data_map = load_wallet_data('last_processed_input_data')
-            last_processed_input_id = last_processed_input_data_map['last_id']
-            last_processed_tx_hash = last_processed_input_data_map['last_tx_hash']
-            last_processed_tx_wallet_id = last_processed_input_data_map['last_tx_wallet_id']
-            if last_processed_input_data_map is not None and last_processed_input_id is not None and last_processed_tx_hash is not None and last_processed_tx_wallet_id is not None:
-                return int(last_processed_input_id), last_processed_tx_hash, last_processed_tx_wallet_id
-    except:
-        pass
-
-    return 0, None, None
-
 def execute_sql_query(query):
     gp_cursor.execute(query)
     return gp_cursor.fetchall()
@@ -140,7 +126,8 @@ def main():
 
     global wallet_final_state_map 
     wallet_final_state_map = load_wallet_data('wallet_final_state_map')
-    print('Loaded {0} wallet_final_state_map entries to the memory'.format(len(wallet_final_state_map)))
+    if wallet_final_state_map != None:
+        print('Loaded {0} wallet_final_state_map entries to the memory'.format(len(wallet_final_state_map)))
     
     if not gp_connection or not gp_cursor:
         connects_to_greenplum()
