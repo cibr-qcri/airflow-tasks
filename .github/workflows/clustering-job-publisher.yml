@@ -1,4 +1,4 @@
-name: Publish
+name: Toshi Clustering Job Publisher
 on:
   push:
     branches: [main]
@@ -35,10 +35,10 @@ jobs:
       - name: Build & Push Containers to DockerHub
         run: |
           for changed_file in ${{ steps.modified-files.outputs.all }}; do
-            if [[ $changed_file == scripts* ]] ;
+            if [[ $changed_file == scripts/btc-clustering/* ]] ;
             then
-              file=${changed_file##*/}
-
+              path_prefix="scripts/btc-clustering/"
+              file=${changed_file#$path_prefix}
               docker build \
                 --build-arg "modified_file=$changed_file" \
                 --build-arg elasticsearch_host=$es_host \
