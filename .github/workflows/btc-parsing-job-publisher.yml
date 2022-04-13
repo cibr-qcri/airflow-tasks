@@ -1,0 +1,59 @@
+name: Toshi Parser Job Publisher
+on:
+  push:
+    branches: [main]
+env:
+  arango_username: ${{ secrets.ARANGO_USERNAME }}
+  arango_password: ${{ secrets.ARANGO_PASSWORD }}
+  arango_host: ${{ secrets.ARANGO_HOST }}
+  arango_port: ${{ secrets.ARANGO_PORT }}
+  arango_db: ${{ secrets.ARANGO_DB }}
+  gp_host: ${{ secrets.GP_CONNECTION_HOST }}
+  gp_port: ${{ secrets.GP_CONNECTION_PORT }}
+  gp_username: ${{ secrets.GP_CONNECTION_USERNAME }}
+  gp_password: ""
+  gp_db: ${{ secrets.GP_CONNECTION_DB }}
+jobs:
+  push_to_registry:
+    name: Push Docker image to Docker Hub
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
+        with:
+          ref: main
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - id: modified-files
+        uses: jitterbit/get-changed-files@v1
+      - name: Build & Push Containers to DockerHub
+        run: |
+          cd scripts/btc-parser
+          for changed_file in ${{ steps.modified-files.outputs.all }}; do
+            if [[ $changed_file == scripts/btc-parser/* ]] ;
+            then
+              docker build \
+                --build-arg arango_host=$arango_host \
+                --build-arg arango_port=$arango_port \
+                --build-arg arango_username=$arango_username \
+                --build-arg arango_password=$arango_password \
+                --build-arg arango_db=$arango_db \
+                --build-arg gp_host=$gp_host \
+                --build-arg gp_port=$gp_port \
+                --build-arg gp_username=$gp_username \
+                --build-arg gp_password=$gp_password \
+                --build-arg gp_db=$gp_db \
+                -t "toshiqcri/btc-etl-parser:latest" \
+                --no-cache .
+
+              docker push "toshiqcri/btc-etl-parser:latest"
+              break
+            fi
+          done

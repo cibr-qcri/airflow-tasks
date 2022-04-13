@@ -34,25 +34,29 @@ jobs:
         uses: jitterbit/get-changed-files@v1
       - name: Build & Push Containers to DockerHub
         run: |
+          cd scripts/btc-clustering
           for changed_file in ${{ steps.modified-files.outputs.all }}; do
             if [[ $changed_file == scripts/btc-clustering/* ]] ;
             then
               path_prefix="scripts/btc-clustering/"
               file=${changed_file#$path_prefix}
-              docker build \
-                --build-arg "modified_file=$file" \
-                --build-arg elasticsearch_host=$es_host \
-                --build-arg elasticsearch_port=$es_port \
-                --build-arg redis_host=$redis_host \
-                --build-arg redis_port=$redis_port \
-                --build-arg gp_host=$gp_host \
-                --build-arg gp_port=$gp_port \
-                --build-arg gp_username=$gp_username \
-                --build-arg gp_password=$gp_password \
-                --build-arg gp_db=$gp_db \
-                -t "toshiqcri/${file%%_*}:latest" \
-                --no-cache -f scripts/btc-clustering/Dockerfile .
+              if [[ $file == clustering-task* ]] ;
+              then
+                docker build \
+                  --build-arg "modified_file=$file" \
+                  --build-arg elasticsearch_host=$es_host \
+                  --build-arg elasticsearch_port=$es_port \
+                  --build-arg redis_host=$redis_host \
+                  --build-arg redis_port=$redis_port \
+                  --build-arg gp_host=$gp_host \
+                  --build-arg gp_port=$gp_port \
+                  --build-arg gp_username=$gp_username \
+                  --build-arg gp_password=$gp_password \
+                  --build-arg gp_db=$gp_db \
+                  -t "toshiqcri/${file%%_*}:latest" \
+                  --no-cache .
 
-              docker push "toshiqcri/${file%%_*}:latest"
+                docker push "toshiqcri/${file%%_*}:latest"
+              fi
             fi
           done

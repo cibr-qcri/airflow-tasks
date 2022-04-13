@@ -1,9 +1,9 @@
 FROM python:3.8
+LABEL maintainer.0="CIBR-QCRI Team"
 
 WORKDIR /usr/src/job
 
 ARG modified_file
-
 ARG gp_host
 ARG gp_port
 ARG gp_username
@@ -19,7 +19,6 @@ ENV GREENPLUM_DB=$gp_db
 
 COPY dependencies ./dependencies
 COPY requirements.txt ./
-
 COPY $modified_file ./script.py
 
 RUN pip3 install -r requirements.txt

@@ -17,7 +17,6 @@ wallet_to_wallet_map = dict()
 wallet_final_state_map = dict()
 wallet_temp_map = dict()
 
-
 def connects_to_greenplum():
     try:
         # Connect to an existing database
