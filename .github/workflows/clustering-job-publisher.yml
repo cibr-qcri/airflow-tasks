@@ -40,7 +40,7 @@ jobs:
               path_prefix="scripts/btc-clustering/"
               file=${changed_file#$path_prefix}
               docker build \
-                --build-arg "modified_file=$changed_file" \
+                --build-arg "modified_file=$file" \
                 --build-arg elasticsearch_host=$es_host \
                 --build-arg elasticsearch_port=$es_port \
                 --build-arg redis_host=$redis_host \
@@ -51,7 +51,7 @@ jobs:
                 --build-arg gp_password=$gp_password \
                 --build-arg gp_db=$gp_db \
                 -t "toshiqcri/${file%%_*}:latest" \
-                --no-cache .
+                --no-cache -f scripts/btc-clustering/Dockerfile .
 
               docker push "toshiqcri/${file%%_*}:latest"
             fi

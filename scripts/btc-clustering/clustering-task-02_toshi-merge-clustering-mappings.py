@@ -5,6 +5,7 @@ import pickle
 from pathlib import Path
 import os
 import csv
+import logging
 
 gp_connection = None
 gp_cursor = None
@@ -32,7 +33,7 @@ def connects_to_greenplum():
         gp_cursor = gp_connection.cursor()
         gp_cursor.execute("SELECT version();")
         record = gp_cursor.fetchone()
-        print("You are connected to - ", record, "\n")
+        logging.info("You are connected to - ", record, "\n")
         return
 
     except (Exception, Error) as error:
@@ -43,9 +44,9 @@ def close_gp_connection():
         if (gp_connection):
             gp_cursor.close()
             gp_connection.close()
-            print("PostgreSQL connection is closed")
+            logging.info("PostgreSQL connection is closed")
     except (Exception, Error) as error:
-        print("Error while closing the connection to PostgreSQL", error)
+        logging.info("Error while closing the connection to PostgreSQL", error)
 
 def save_wallet_data():
     # save data in a csv file
@@ -54,7 +55,7 @@ def save_wallet_data():
         writer = csv.writer(csv_file)
         for key, value in address_wallet_map.items():
             writer.writerow([key, value])
-    print("Multi address clustering - wallet mapping successfully write into a file: ", file_name)  
+    logging.info("Multi address clustering - wallet mapping successfully write into a file: ", file_name)  
 
     with open(volume_mount_path + 'wallet_final_state_map.pickle', 'wb') as f:
         pickle.dump(wallet_final_state_map, f, pickle.HIGHEST_PROTOCOL)
@@ -107,29 +108,34 @@ def post_process_wallet_data():
         count = count + 1
 
         if count % 100000 == 0:
-            print("Processed another 100000 input address, total: ", count)
+            logging.info("Processed another 100000 input address, total: ", count)
 
-    print("Multi address clustering - wallet mapping completed successfully")
+    logging.info("Multi address clustering - wallet mapping completed successfully")
 
 def main():
-    print("Script started to merge all cluster ids for all clustered input addresses")
+    logging.info("Script started to merge all cluster ids for all clustered input addresses")
+
+    # remove previous csv file if exists
+    clustered_csv = Path(volume_mount_path + "address_wallet_mapping.csv")
+    if clustered_csv.exists():
+        os.remove(clustered_csv)
 
     global address_wallet_map 
     address_wallet_map = load_wallet_data('address_wallet_map')
-    print('Loaded {0} address_wallet_map entries to the memory'.format(len(address_wallet_map)))
+    logging.info('Loaded {0} address_wallet_map entries to the memory'.format(len(address_wallet_map)))
 
     global wallet_to_wallet_map
     wallet_to_wallet_map = load_wallet_data('wallet_to_wallet_map')
-    print('Loaded {0} wallet_to_wallet_map entries to the memory'.format(len(wallet_to_wallet_map)))
+    logging.info('Loaded {0} wallet_to_wallet_map entries to the memory'.format(len(wallet_to_wallet_map)))
 
     global wallet_temp_map
     wallet_temp_map = load_wallet_data('wallet_temp_map')
-    print('Loaded {0} wallet_temp_map entries to the memory'.format(len(wallet_temp_map)))
+    logging.info('Loaded {0} wallet_temp_map entries to the memory'.format(len(wallet_temp_map)))
 
     global wallet_final_state_map 
     wallet_final_state_map = load_wallet_data('wallet_final_state_map')
     if wallet_final_state_map != None:
-        print('Loaded {0} wallet_final_state_map entries to the memory'.format(len(wallet_final_state_map)))
+        logging.info('Loaded {0} wallet_final_state_map entries to the memory'.format(len(wallet_final_state_map)))
     
     if not gp_connection or not gp_cursor:
         connects_to_greenplum()
@@ -147,7 +153,7 @@ def main():
     clear_data()
 
     # print_wallet_data_structure()
-    print("Multi address cluster-mapping process completed successfully")
+    logging.info("Multi address cluster-mapping process completed successfully")
 
 if __name__ == "__main__":
     main()
