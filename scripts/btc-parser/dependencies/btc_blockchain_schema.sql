@@ -14,7 +14,8 @@ CREATE TABLE IF NOT EXISTS btc_transaction (
 	hash varchar(65),
 	input_count integer,
 	input_usd_value numeric,
-	output_usd_value numeric
+	output_usd_value numeric,
+	timestamp bigint
 );
 
 CREATE TABLE IF NOT EXISTS btc_block (

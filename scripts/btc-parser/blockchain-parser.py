@@ -175,7 +175,6 @@ def build_transactions(tx):
     transaction.append(tx['block_number'])
     transaction.append(tx['index'])
     transaction.append(tx['fee'])
-    # transaction.append(tx['block_timestamp'])
     transaction.append(tx['input_value'])
     transaction.append(tx['output_value'])
     transaction.append(tx['is_coinbase'])
@@ -183,6 +182,7 @@ def build_transactions(tx):
     transaction.append(tx['output_count'])
     transaction.append(convert_satoshi_to_usd(tx['input_value'], block_timestamp_map[tx['block_number']]))
     transaction.append(convert_satoshi_to_usd(tx['output_value'], block_timestamp_map[tx['block_number']]))
+    transaction.append(tx['block_timestamp'])
     transaction_buffer.append(transaction)
 
 

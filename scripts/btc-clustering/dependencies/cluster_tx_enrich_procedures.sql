@@ -24,7 +24,8 @@ begin
       is_coinbase,
       input_count,
       output_count,
-      tx_type
+      tx_type,
+      timestamp
     ) (
       select
         cluster_id,
@@ -35,7 +36,8 @@ begin
         is_coinbase,
         input_count,
         output_count,
-        'Sending' as tx_type
+        'Sending' as tx_type,
+        timestamp
       from
         (
           select
@@ -63,7 +65,8 @@ begin
       is_coinbase,
       input_count,
       output_count,
-      tx_type
+      tx_type,
+      timestamp
     ) (
       select
         cluster_id,
@@ -74,7 +77,8 @@ begin
         is_coinbase,
         input_count,
         output_count,
-        'Receiving' as tx_type
+        'Receiving' as tx_type,
+        timestamp
       from
         (
           select

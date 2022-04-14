@@ -34,5 +34,6 @@ CREATE TABLE tmp_btc_wallet_transaction(
 	output_count integer,
 	tx_type varchar(40),
 	input_usd_value numeric,
-	output_usd_value numeric
+	output_usd_value numeric,
+	timestamp bigint
 );
