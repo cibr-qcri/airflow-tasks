@@ -1,4 +1,4 @@
-name: BTC Blockchain Parser Job Publisher
+name: BTC Address Labeling Job Publisher
 on:
   push:
     branches: [main]
@@ -35,9 +35,9 @@ jobs:
         uses: jitterbit/get-changed-files@v1
       - name: Build & Push Containers to DockerHub
         run: |
-          cd scripts/btc-parser
+          cd scripts/btc-address-labels
           for changed_file in ${{ steps.modified-files.outputs.all }}; do
-            if [[ $changed_file == scripts/btc-parser/* ]] ;
+            if [[ $changed_file == scripts/btc-address-labels/* ]] ;
             then
               docker build \
                 --build-arg arango_host=$arango_host \
@@ -50,10 +50,10 @@ jobs:
                 --build-arg gp_username=$gp_username \
                 --build-arg gp_password=$gp_password \
                 --build-arg gp_db=$gp_db \
-                -t "toshiqcri/btc-etl-parser:latest" \
+                -t "toshiqcri/btc-address-labels:latest" \
                 --no-cache .
 
-              docker push "toshiqcri/btc-etl-parser:latest"
+              docker push "toshiqcri/btc-address-labels:latest"
               break
             fi
           done

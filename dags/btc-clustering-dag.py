@@ -22,7 +22,7 @@ volume_config = {
 volume = Volume(name='toshi-airflow-pvc', configs=volume_config)
 
 def failure_end_job():
-    print("Toshi clustering job failed")
+    print("BTC wallet clustering job failed")
 
 default_dag_args = {
     'start_date': YESTERDAY,

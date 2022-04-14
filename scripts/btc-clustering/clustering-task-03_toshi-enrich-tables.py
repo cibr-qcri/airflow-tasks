@@ -58,7 +58,7 @@ def main():
         # apply tmp table schema in GP
         apply_sql_query(open(local_file_path + "cluster_tables_schema.sql", "r").read())
 
-        # remove previous csv file if exists
+        # check previous csv file if exists
         clustered_csv = Path(volume_mount_path + "address_wallet_mapping.csv")
         if not clustered_csv.exists():
             sys.exit("enrich functions need clustered csv to proceed.")

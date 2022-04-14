@@ -1,4 +1,4 @@
-name: Toshi Clustering Job Publisher
+name: BTC Wallet Clustering Job Publisher
 on:
   push:
     branches: [main]
