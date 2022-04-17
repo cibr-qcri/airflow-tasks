@@ -2,21 +2,21 @@ CREATE TABLE tmp_btc_address_cluster (
 	id SERIAL primary key NOT NULL,
 	cluster_id varchar(65),
 	address varchar(65),
-	total_spent_satoshi bigint,
-	total_spent_usd numeric,
-	total_received_satoshi bigint,
-	total_received_usd numeric
+	total_spent_satoshi bigint DEFAULT 0,
+	total_spent_usd numeric DEFAULT 0,
+	total_received_satoshi bigint DEFAULT 0,
+	total_received_usd numeric DEFAULT 0
 );
 
 CREATE TABLE tmp_btc_wallet(
 	id SERIAL primary key NOT NULL,
 	cluster_id varchar(65),
-	num_address integer,
-	num_tx integer,
-	total_spent bigint,
-	total_spent_usd numeric,
-	total_received bigint,
-	total_received_usd numeric,
+	num_address integer DEFAULT 0,
+	num_tx integer DEFAULT 0,
+	total_spent bigint DEFAULT 0,
+	total_spent_usd numeric DEFAULT 0,
+	total_received bigint DEFAULT 0,
+	total_received_usd numeric DEFAULT 0,
 	risk_score float DEFAULT -1,
 	labels text,
 	categories text
