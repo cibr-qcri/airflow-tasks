@@ -170,16 +170,15 @@ begin
     FROM
       (
         SELECT cluster_id, CAST(json_object_agg(element, count) AS TEXT) as json from (
-		with elements (cluster_id, element) as (
-		select cluster_id, unnest(string_to_array(labels, ',')) from (
-		select tmp_btc_address_cluster.cluster_id, array_to_string(array_agg(btc_address_label.label), ',') as labels from 
-		tmp_btc_address_cluster join btc_address_label ON tmp_btc_address_cluster.address=btc_address_label.address 
-		group by tmp_btc_address_cluster.cluster_id
-		) as labels group by cluster_id, labels) select cluster_id, element, count(*) as count 
-		from elements group by cluster_id, element order by count desc) as data group by cluster_id
+      with elements (cluster_id, element) as (
+      select cluster_id, unnest(string_to_array(labels, ',')) from (
+      select tmp_btc_address_cluster.cluster_id, array_to_string(array_agg(btc_address_label.label), ',') as labels from 
+      tmp_btc_address_cluster join btc_address_label ON tmp_btc_address_cluster.address=btc_address_label.address 
+      group by tmp_btc_address_cluster.cluster_id
+      ) as labels group by cluster_id, labels) select cluster_id, element, count(*) as count 
+      from elements group by cluster_id, element order by count desc) as data group by cluster_id
       ) AS label_wallets
-    WHERE
-      tmp_btc_wallet.cluster_id=label_wallets.cluster_id;
+    WHERE tmp_btc_wallet.cluster_id=label_wallets.cluster_id;
 end ;
 $$ language plpgsql;
 

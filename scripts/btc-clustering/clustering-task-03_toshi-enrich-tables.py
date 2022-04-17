@@ -76,7 +76,10 @@ def main():
 
         # insert enrich tmp_btc_wallet_transaction stored procedure in GP
         apply_sql_query(open(local_file_path + "cluster_tx_enrich_procedures.sql", "r").read())
-        execute_sql_query("SELECT enrich_btc_wallet_transaction_table();")        
+        execute_sql_query("SELECT enrich_btc_wallet_transaction_table();")
+
+        # apply table indexes in GP
+        # apply_sql_query(open(local_file_path + "cluster_table_index.sql", "r").read())
 
     except Exception as e:
         error_message = str(e)

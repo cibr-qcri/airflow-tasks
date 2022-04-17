@@ -132,7 +132,18 @@ def load_bitcointalk_labels(resp):
             current.append(response['_source']['data']['timestamp'])
             current.append(response['_source']['data']['info']['url'])
             bitcointalk_labels.append(current)
-            
+
+def load_bitcoinabuse_labels(resp):
+    for response in resp['hits']['hits']:
+        current = list()
+        current.append(response['_source']['data']['info']['tags']['cryptocurrency']['address']['btc'])
+        current.append(response['_source']['data']['info']['tags']['abuse']['report']['abuser'])
+        current.append(response['_source']['data']['info']['tags']['abuse']['report']['category'])
+        current.append("bitcoinabuse.com")
+        current.append(response['_source']['data']['timestamp'])
+        current.append(response['_source']['data']['info']['url'])
+        bitcoinabuse_labels.append(current)
+
 def get_darkweb_labels():
     resp = es.search(index="darkweb-tor-index",body={
         "size": STEP_SIZE,
@@ -297,6 +308,42 @@ def get_bitcointalk_labels():
             writer.writerows(bitcointalk_labels)
     bitcointalk_labels.clear()
 
+def get_bitcoinabuse_labels():
+    resp = es.search(index="cibr-bitcoinabuse",body={
+        "size": STEP_SIZE,
+        "query": {
+            "bool": {
+                "must": [
+                    {
+                        "range": {
+                            "data.timestamp": {
+                                "gte": last_timestamp
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    }, scroll='1m')
+
+    scroll_id = resp['_scroll_id']
+    load_bitcoinabuse_labels(resp)
+
+    try:
+        for step in range(STEP_SIZE, resp['hits']['total']['value'], STEP_SIZE):
+            resp = es.scroll(scroll_id=scroll_id, scroll='1m')
+            scroll_id = resp['_scroll_id']
+            load_bitcoinabuse_labels(resp)      
+    except:
+        pass
+
+    # store labels
+    if len(bitcoinabuse_labels) > 0:
+        with open(volume_mount_path + 'bitcoinabuse_labels.csv', 'w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerows(bitcoinabuse_labels)
+    bitcoinabuse_labels.clear()
+
 def main():
     if not gp_connection or not gp_cursor:
         connects_to_greenplum()
@@ -346,7 +393,7 @@ def main():
         bitcoinabuse_csv = Path(volume_mount_path + "bitcoinabuse_labels.csv")
         if bitcoinabuse_csv.exists():
             os.remove(bitcoinabuse_csv)
-        # get_bitcoinabuse_labels();
+        get_bitcoinabuse_labels();
         if bitcoinabuse_csv.exists():
             apply_sql_query("\\COPY btc_address_label(address, label, category, source, timestamp, note) FROM bitcoinabuse_labels.csv CSV DELIMITER E','")
 

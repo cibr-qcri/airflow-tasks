@@ -18,7 +18,7 @@ default_dag_args = {
 }
 
 with models.DAG(
-        dag_id='btc-parse-dag',
+        dag_id='btc-parser-dag',
         schedule_interval='@weekly',
         default_args=default_dag_args) as dag:
 
