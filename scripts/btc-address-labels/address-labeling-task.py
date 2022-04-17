@@ -22,6 +22,7 @@ bitcointalk_labels = list()
 bitcoinabuse_labels = list()
 splcenter_labels = list()
 github_labels = list()
+graphsense_labels = list()
 
 def connects_to_greenplum():
     try:
@@ -168,6 +169,16 @@ def load_github_labels(resp):
         current.append(response['_source']['data']['info']['tags']['repository']['note'])
         github_labels.append(current)
 
+def load_graphsense_labels(resp):
+    for response in resp['hits']['hits']:
+        current = list()
+        current.append(response['_source']['data']['info']['tags']['cryptocurrency']['address']['btc'])
+        current.append(response['_source']['data']['info']['tags']['label'])
+        current.append(response['_source']['data']['info']['tags']['category'])
+        current.append("graphsense.info")
+        current.append(response['_source']['data']['timestamp'])
+        current.append(response['_source']['data']['info']['tags']['note'])
+        graphsense_labels.append(current)
 
 def get_darkweb_labels():
     resp = es.search(index="darkweb-tor-index",body={
@@ -441,6 +452,42 @@ def get_github_labels():
             writer.writerows(github_labels)
     github_labels.clear()
 
+def get_graphsense_labels():
+    resp = es.search(index="cibr-graphsense",body={
+        "size": STEP_SIZE,
+        "query": {
+            "bool": {
+                "must": [
+                    {
+                        "range": {
+                            "data.timestamp": {
+                                "gte": last_timestamp
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    }, scroll='1m')
+
+    scroll_id = resp['_scroll_id']
+    load_graphsense_labels(resp)
+
+    try:
+        for step in range(STEP_SIZE, resp['hits']['total']['value'], STEP_SIZE):
+            resp = es.scroll(scroll_id=scroll_id, scroll='1m')
+            scroll_id = resp['_scroll_id']
+            load_graphsense_labels(resp)      
+    except:
+        pass
+
+    # store labels
+    if len(graphsense_labels) > 0:
+        with open(volume_mount_path + 'graphsense_labels.csv', 'w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerows(graphsense_labels)
+    graphsense_labels.clear()
+
 def main():
     if not gp_connection or not gp_cursor:
         connects_to_greenplum()
@@ -455,6 +502,7 @@ def main():
         last_timestamp = load_last_processed_timestamp()
 
         # get darkweb labels
+        logging.info("Processing darkweb labels.")
         darkweb_csv = Path(volume_mount_path + "darkweb_labels.csv")
         if darkweb_csv.exists():
             os.remove(darkweb_csv)
@@ -463,6 +511,7 @@ def main():
             apply_sql_query("\\COPY btc_address_label(address, label, category, source, timestamp, note) FROM darkweb_labels.csv CSV DELIMITER E','")
 
         # get walletexplorer labels
+        logging.info("Processing walletexplorer labels.")
         walletexplorer_csv = Path(volume_mount_path + "walletexplorer_labels.csv")
         if walletexplorer_csv.exists():
             os.remove(walletexplorer_csv)
@@ -471,6 +520,7 @@ def main():
             apply_sql_query("\\COPY btc_address_label(address, label, category, source, timestamp, note) FROM walletexplorer_labels.csv CSV DELIMITER E','")
 
         # get twitter labels
+        logging.info("Processing twitter labels.")
         twitter_csv = Path(volume_mount_path + "twitter_labels.csv")
         if twitter_csv.exists():
             os.remove(twitter_csv)
@@ -479,6 +529,7 @@ def main():
             apply_sql_query("\\COPY btc_address_label(address, label, category, source, timestamp, note) FROM twitter_labels.csv CSV DELIMITER E','")
 
         # get bitcointalk labels
+        logging.info("Processing bitcointalk labels.")
         bitcointalk_csv = Path(volume_mount_path + "bitcointalk_labels.csv")
         if bitcointalk_csv.exists():
             os.remove(bitcointalk_csv)
@@ -487,6 +538,7 @@ def main():
             apply_sql_query("\\COPY btc_address_label(address, label, category, source, timestamp, note) FROM bitcointalk_labels.csv CSV DELIMITER E','")
 
         # get bitcoinabuse labels
+        logging.info("Processing bitcoinabuse labels.")
         bitcoinabuse_csv = Path(volume_mount_path + "bitcoinabuse_labels.csv")
         if bitcoinabuse_csv.exists():
             os.remove(bitcoinabuse_csv)
@@ -495,6 +547,7 @@ def main():
             apply_sql_query("\\COPY btc_address_label(address, label, category, source, timestamp, note) FROM bitcoinabuse_labels.csv CSV DELIMITER E','")
 
         # get splcenter labels
+        logging.info("Processing splcenter labels.")
         splcenter_csv = Path(volume_mount_path + "splcenter_labels.csv")
         if splcenter_csv.exists():
             os.remove(splcenter_csv)
@@ -503,12 +556,22 @@ def main():
             apply_sql_query("\\COPY btc_address_label(address, label, category, source, timestamp, note) FROM splcenter_labels.csv CSV DELIMITER E','")
 
         # get github labels
+        logging.info("Processing github labels.")
         github_csv = Path(volume_mount_path + "github_labels.csv")
         if github_csv.exists():
             os.remove(github_csv)
         get_github_labels();
         if github_csv.exists():
             apply_sql_query("\\COPY btc_address_label(address, label, category, source, timestamp, note) FROM github_labels.csv CSV DELIMITER E','")
+
+        # get graphsense labels
+        logging.info("Processing graphsense labels.")
+        graphsense_csv = Path(volume_mount_path + "graphsense_labels.csv")
+        if graphsense_csv.exists():
+            os.remove(graphsense_csv)
+        get_graphsense_labels();
+        if graphsense_csv.exists():
+            apply_sql_query("\\COPY btc_address_label(address, label, category, source, timestamp, note) FROM graphsense_labels.csv CSV DELIMITER E','")
 
     except Exception as e:
         error_message = str(e)
