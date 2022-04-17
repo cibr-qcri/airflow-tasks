@@ -21,6 +21,7 @@ twitter_labels = list()
 bitcointalk_labels = list()
 bitcoinabuse_labels = list()
 splcenter_labels = list()
+github_labels = list()
 
 def connects_to_greenplum():
     try:
@@ -155,6 +156,18 @@ def load_splcenter_labels(resp):
         current.append(response['_source']['data']['timestamp'])
         current.append(response['_source']['data']['info']['tags']['report']['report']['note'])
         splcenter_labels.append(current)
+
+def load_github_labels(resp):
+    for response in resp['hits']['hits']:
+        current = list()
+        current.append(response['_source']['data']['info']['tags']['cryptocurrency']['address']['btc'])
+        current.append(response['_source']['data']['info']['tags']['repository']['name'])
+        current.append(response['_source']['data']['info']['tags']['repository']['category'])
+        current.append("github.com")
+        current.append(response['_source']['data']['timestamp'])
+        current.append(response['_source']['data']['info']['tags']['repository']['note'])
+        github_labels.append(current)
+
 
 def get_darkweb_labels():
     resp = es.search(index="darkweb-tor-index",body={
@@ -392,6 +405,42 @@ def get_splcenter_labels():
             writer.writerows(splcenter_labels)
     splcenter_labels.clear()
 
+def get_github_labels():
+    resp = es.search(index="cibr-github",body={
+        "size": STEP_SIZE,
+        "query": {
+            "bool": {
+                "must": [
+                    {
+                        "range": {
+                            "data.timestamp": {
+                                "gte": last_timestamp
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    }, scroll='1m')
+
+    scroll_id = resp['_scroll_id']
+    load_github_labels(resp)
+
+    try:
+        for step in range(STEP_SIZE, resp['hits']['total']['value'], STEP_SIZE):
+            resp = es.scroll(scroll_id=scroll_id, scroll='1m')
+            scroll_id = resp['_scroll_id']
+            load_github_labels(resp)      
+    except:
+        pass
+
+    # store labels
+    if len(github_labels) > 0:
+        with open(volume_mount_path + 'github_labels.csv', 'w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerows(github_labels)
+    github_labels.clear()
+
 def main():
     if not gp_connection or not gp_cursor:
         connects_to_greenplum()
@@ -452,6 +501,14 @@ def main():
         get_splcenter_labels();
         if splcenter_csv.exists():
             apply_sql_query("\\COPY btc_address_label(address, label, category, source, timestamp, note) FROM splcenter_labels.csv CSV DELIMITER E','")
+
+        # get github labels
+        github_csv = Path(volume_mount_path + "github_labels.csv")
+        if github_csv.exists():
+            os.remove(github_csv)
+        get_github_labels();
+        if github_csv.exists():
+            apply_sql_query("\\COPY btc_address_label(address, label, category, source, timestamp, note) FROM github_labels.csv CSV DELIMITER E','")
 
     except Exception as e:
         error_message = str(e)
