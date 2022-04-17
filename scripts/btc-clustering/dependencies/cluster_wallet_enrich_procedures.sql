@@ -17,9 +17,9 @@ begin
     raise notice 'Wallet tabel is updated with total received usd amounts!';
     PERFORM enrich_wallet_total_tx();
     raise notice 'Wallet tabel is updated with total tx counts!';
-	  PERFORM enrich_wallet_labels();
+    PERFORM enrich_wallet_labels();
     raise notice 'Wallet tabel is updated with labels!';
-	  PERFORM enrich_wallet_categories();
+    PERFORM enrich_wallet_categories();
     raise notice 'Wallet tabel is updated with categories!';
 end ;
 $$ language plpgsql;
