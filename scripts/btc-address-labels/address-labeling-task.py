@@ -20,6 +20,7 @@ walletexplorer_labels = list()
 twitter_labels = list()
 bitcointalk_labels = list()
 bitcoinabuse_labels = list()
+splcenter_labels = list()
 
 def connects_to_greenplum():
     try:
@@ -143,6 +144,17 @@ def load_bitcoinabuse_labels(resp):
         current.append(response['_source']['data']['timestamp'])
         current.append(response['_source']['data']['info']['url'])
         bitcoinabuse_labels.append(current)
+
+def load_splcenter_labels(resp):
+    for response in resp['hits']['hits']:
+        current = list()
+        current.append(response['_source']['data']['info']['tags']['cryptocurrency']['address']['btc'])
+        current.append(response['_source']['data']['info']['tags']['report']['report']['label'])
+        current.append(response['_source']['data']['info']['tags']['report']['report']['category'])
+        current.append("splcenter.org")
+        current.append(response['_source']['data']['timestamp'])
+        current.append(response['_source']['data']['info']['tags']['report']['report']['note'])
+        splcenter_labels.append(current)
 
 def get_darkweb_labels():
     resp = es.search(index="darkweb-tor-index",body={
@@ -344,6 +356,42 @@ def get_bitcoinabuse_labels():
             writer.writerows(bitcoinabuse_labels)
     bitcoinabuse_labels.clear()
 
+def get_splcenter_labels():
+    resp = es.search(index="cibr-splcenter",body={
+        "size": STEP_SIZE,
+        "query": {
+            "bool": {
+                "must": [
+                    {
+                        "range": {
+                            "data.timestamp": {
+                                "gte": last_timestamp
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    }, scroll='1m')
+
+    scroll_id = resp['_scroll_id']
+    load_splcenter_labels(resp)
+
+    try:
+        for step in range(STEP_SIZE, resp['hits']['total']['value'], STEP_SIZE):
+            resp = es.scroll(scroll_id=scroll_id, scroll='1m')
+            scroll_id = resp['_scroll_id']
+            load_splcenter_labels(resp)      
+    except:
+        pass
+
+    # store labels
+    if len(splcenter_labels) > 0:
+        with open(volume_mount_path + 'splcenter_labels.csv', 'w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerows(splcenter_labels)
+    splcenter_labels.clear()
+
 def main():
     if not gp_connection or not gp_cursor:
         connects_to_greenplum()
@@ -396,6 +444,14 @@ def main():
         get_bitcoinabuse_labels();
         if bitcoinabuse_csv.exists():
             apply_sql_query("\\COPY btc_address_label(address, label, category, source, timestamp, note) FROM bitcoinabuse_labels.csv CSV DELIMITER E','")
+
+        # get splcenter labels
+        splcenter_csv = Path(volume_mount_path + "splcenter_labels.csv")
+        if splcenter_csv.exists():
+            os.remove(splcenter_csv)
+        get_splcenter_labels();
+        if splcenter_csv.exists():
+            apply_sql_query("\\COPY btc_address_label(address, label, category, source, timestamp, note) FROM splcenter_labels.csv CSV DELIMITER E','")
 
     except Exception as e:
         error_message = str(e)
