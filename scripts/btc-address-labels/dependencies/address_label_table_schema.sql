@@ -6,6 +6,6 @@ CREATE TABLE IF NOT EXISTS btc_address_label (
 	source varchar(255),
 	category varchar(255),
 	note text,
-	timestamp timestamp DEFAULT now()
+	timestamp bigint
 );
 
