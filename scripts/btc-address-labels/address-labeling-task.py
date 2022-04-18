@@ -9,7 +9,10 @@ import time
 from pathlib import Path
 from elasticsearch import Elasticsearch
 
-es = Elasticsearch(["es.cibr.qcri.org"], scheme="http", port=80, timeout=50, max_retries=10, retry_on_timeout=True)
+es = Elasticsearch(
+    ['http://es.cibr.qcri.org:80'],
+    max_retries=10, retry_on_timeout=True
+)
 last_timestamp = 0
 volume_mount_path = '/opt/airflow/dags/'
 STEP_SIZE = 10000
