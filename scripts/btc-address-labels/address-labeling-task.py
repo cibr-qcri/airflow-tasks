@@ -510,7 +510,8 @@ def main():
             os.remove(darkweb_csv)
         get_darkweb_labels();
         if darkweb_csv.exists():
-            apply_sql_query("\\COPY btc_address_label(address, label, category, source, timestamp, note) FROM darkweb_labels.csv CSV DELIMITER E','")
+            apply_sql_query("\\COPY btc_address_label(address, label, category, source, timestamp, note) FROM " 
+            + volume_mount_path + "darkweb_labels.csv CSV DELIMITER E','")
 
         # get walletexplorer labels
         logging.info("Processing walletexplorer labels.")
@@ -519,7 +520,8 @@ def main():
             os.remove(walletexplorer_csv)
         get_walletexplorer_labels();
         if walletexplorer_csv.exists():
-            apply_sql_query("\\COPY btc_address_label(address, label, category, source, timestamp, note) FROM walletexplorer_labels.csv CSV DELIMITER E','")
+            apply_sql_query("\\COPY btc_address_label(address, label, category, source, timestamp, note) FROM " 
+            + volume_mount_path + "walletexplorer_labels.csv CSV DELIMITER E','")
 
         # get twitter labels
         logging.info("Processing twitter labels.")
@@ -528,7 +530,8 @@ def main():
             os.remove(twitter_csv)
         get_twitter_labels();
         if twitter_csv.exists():
-            apply_sql_query("\\COPY btc_address_label(address, label, category, source, timestamp, note) FROM twitter_labels.csv CSV DELIMITER E','")
+            apply_sql_query("\\COPY btc_address_label(address, label, category, source, timestamp, note) FROM " 
+            + volume_mount_path + "twitter_labels.csv CSV DELIMITER E','")
 
         # get bitcointalk labels
         logging.info("Processing bitcointalk labels.")
@@ -537,7 +540,8 @@ def main():
             os.remove(bitcointalk_csv)
         get_bitcointalk_labels();
         if bitcointalk_csv.exists():
-            apply_sql_query("\\COPY btc_address_label(address, label, category, source, timestamp, note) FROM bitcointalk_labels.csv CSV DELIMITER E','")
+            apply_sql_query("\\COPY btc_address_label(address, label, category, source, timestamp, note) FROM " 
+            + volume_mount_path + "bitcointalk_labels.csv CSV DELIMITER E','")
 
         # get bitcoinabuse labels
         logging.info("Processing bitcoinabuse labels.")
@@ -546,7 +550,8 @@ def main():
             os.remove(bitcoinabuse_csv)
         get_bitcoinabuse_labels();
         if bitcoinabuse_csv.exists():
-            apply_sql_query("\\COPY btc_address_label(address, label, category, source, timestamp, note) FROM bitcoinabuse_labels.csv CSV DELIMITER E','")
+            apply_sql_query("\\COPY btc_address_label(address, label, category, source, timestamp, note) FROM " 
+            + volume_mount_path + "bitcoinabuse_labels.csv CSV DELIMITER E','")
 
         # get splcenter labels
         logging.info("Processing splcenter labels.")
@@ -555,7 +560,8 @@ def main():
             os.remove(splcenter_csv)
         get_splcenter_labels();
         if splcenter_csv.exists():
-            apply_sql_query("\\COPY btc_address_label(address, label, category, source, timestamp, note) FROM splcenter_labels.csv CSV DELIMITER E','")
+            apply_sql_query("\\COPY btc_address_label(address, label, category, source, timestamp, note) FROM " 
+            + volume_mount_path + "splcenter_labels.csv CSV DELIMITER E','")
 
         # get github labels
         logging.info("Processing github labels.")
@@ -564,7 +570,8 @@ def main():
             os.remove(github_csv)
         get_github_labels();
         if github_csv.exists():
-            apply_sql_query("\\COPY btc_address_label(address, label, category, source, timestamp, note) FROM github_labels.csv CSV DELIMITER E','")
+            apply_sql_query("\\COPY btc_address_label(address, label, category, source, timestamp, note) FROM " 
+            + volume_mount_path + "github_labels.csv CSV DELIMITER E','")
 
         # get graphsense labels
         logging.info("Processing graphsense labels.")
@@ -573,7 +580,8 @@ def main():
             os.remove(graphsense_csv)
         get_graphsense_labels();
         if graphsense_csv.exists():
-            apply_sql_query("\\COPY btc_address_label(address, label, category, source, timestamp, note) FROM graphsense_labels.csv CSV DELIMITER E','")
+            apply_sql_query("\\COPY btc_address_label(address, label, category, source, timestamp, note) FROM " 
+            + volume_mount_path + "graphsense_labels.csv CSV DELIMITER E','")
 
     except Exception as e:
         error_message = str(e)
