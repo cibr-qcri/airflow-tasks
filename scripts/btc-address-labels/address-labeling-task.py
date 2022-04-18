@@ -13,6 +13,8 @@ es = Elasticsearch(
     ['http://es.cibr.qcri.org:80'],
     max_retries=10, retry_on_timeout=True
 )
+gp_connection = None
+gp_cursor = None
 last_timestamp = 0
 volume_mount_path = '/opt/airflow/dags/'
 STEP_SIZE = 10000
