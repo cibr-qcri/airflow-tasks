@@ -138,14 +138,16 @@ def load_bitcointalk_labels(resp):
 
 def load_bitcoinabuse_labels(resp):
     for response in resp['hits']['hits']:
-        current = list()
-        current.append(response['_source']['data']['info']['tags']['cryptocurrency']['address']['btc'])
-        current.append(response['_source']['data']['info']['tags']['abuse']['report']['abuser'])
-        current.append(response['_source']['data']['info']['tags']['abuse']['report']['category'])
-        current.append("bitcoinabuse.com")
-        current.append(response['_source']['data']['timestamp'])
-        current.append(response['_source']['data']['info']['url'])
-        bitcoinabuse_labels.append(current)
+        abusers = response['_source']['data']['info']['tags']['abuse']['report']['abuser'].split(',')
+        for abuser in abusers:
+            current = list()
+            current.append(response['_source']['data']['info']['tags']['cryptocurrency']['address']['btc'])
+            current.append(abuser)
+            current.append(response['_source']['data']['info']['tags']['abuse']['report']['category'])
+            current.append("bitcoinabuse.com")
+            current.append(response['_source']['data']['timestamp'])
+            current.append(response['_source']['data']['info']['url'])
+            bitcoinabuse_labels.append(current)
 
 def load_splcenter_labels(resp):
     for response in resp['hits']['hits']:
