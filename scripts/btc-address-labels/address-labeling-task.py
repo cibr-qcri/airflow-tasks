@@ -190,6 +190,12 @@ def load_graphsense_labels(resp):
         current.append(response['_source']['data']['info']['tags']['note'])
         graphsense_labels.append(current)
 
+def store_csv(file_name, label_list):
+    csv_file = volume_mount_path + file_name
+    with open(csv_file, 'w') as file:
+        writer = csv.writer(file, delimiter=DELIMITER)
+        writer.writerows(label_list)
+
 def get_darkweb_labels():
     resp = es.search(index="darkweb-tor-index",body={
         "size": STEP_SIZE,
@@ -236,9 +242,7 @@ def get_darkweb_labels():
 
     # store labels
     if len(darkweb_labels) > 0:
-        with open(volume_mount_path + 'darkweb_labels.csv', 'w', newline='') as file:
-            writer = csv.writer(file, delimiter=DELIMITER)
-            writer.writerows(darkweb_labels)
+        store_csv('darkweb_labels.csv', darkweb_labels)
     darkweb_labels.clear()
 
 def get_walletexplorer_labels():
@@ -272,9 +276,7 @@ def get_walletexplorer_labels():
 
     # store labels
     if len(walletexplorer_labels) > 0:
-        with open(volume_mount_path + 'walletexplorer_labels.csv', 'w', newline='') as file:
-            writer = csv.writer(file, delimiter=DELIMITER)
-            writer.writerows(walletexplorer_labels)
+        store_csv('walletexplorer_labels.csv', walletexplorer_labels)
     walletexplorer_labels.clear()
 
 def get_twitter_labels():
@@ -308,9 +310,7 @@ def get_twitter_labels():
 
     # store labels
     if len(twitter_labels) > 0:
-        with open(volume_mount_path + 'twitter_labels.csv', 'w', newline='') as file:
-            writer = csv.writer(file, delimiter=DELIMITER)
-            writer.writerows(twitter_labels)
+        store_csv('twitter_labels.csv', twitter_labels)
     twitter_labels.clear()
 
 def get_bitcointalk_labels():
@@ -349,9 +349,7 @@ def get_bitcointalk_labels():
 
     # store labels
     if len(bitcointalk_labels) > 0:
-        with open(volume_mount_path + 'bitcointalk_labels.csv', 'w', newline='') as file:
-            writer = csv.writer(file, delimiter=DELIMITER)
-            writer.writerows(bitcointalk_labels)
+        store_csv('bitcointalk_labels.csv', bitcointalk_labels)
     bitcointalk_labels.clear()
 
 def get_bitcoinabuse_labels():
@@ -385,9 +383,7 @@ def get_bitcoinabuse_labels():
 
     # store labels
     if len(bitcoinabuse_labels) > 0:
-        with open(volume_mount_path + 'bitcoinabuse_labels.csv', 'w', newline='') as file:
-            writer = csv.writer(file, delimiter=DELIMITER)
-            writer.writerows(bitcoinabuse_labels)
+        store_csv('bitcoinabuse_labels.csv', bitcoinabuse_labels)
     bitcoinabuse_labels.clear()
 
 def get_splcenter_labels():
@@ -421,9 +417,7 @@ def get_splcenter_labels():
 
     # store labels
     if len(splcenter_labels) > 0:
-        with open(volume_mount_path + 'splcenter_labels.csv', 'w', newline='') as file:
-            writer = csv.writer(file, delimiter=DELIMITER)
-            writer.writerows(splcenter_labels)
+        store_csv('splcenter_labels.csv', splcenter_labels)
     splcenter_labels.clear()
 
 def get_github_labels():
@@ -457,9 +451,7 @@ def get_github_labels():
 
     # store labels
     if len(github_labels) > 0:
-        with open(volume_mount_path + 'github_labels.csv', 'w', newline='') as file:
-            writer = csv.writer(file, delimiter=DELIMITER)
-            writer.writerows(github_labels)
+        store_csv('github_labels.csv', github_labels)
     github_labels.clear()
 
 def get_graphsense_labels():
@@ -493,9 +485,7 @@ def get_graphsense_labels():
 
     # store labels
     if len(graphsense_labels) > 0:
-        with open(volume_mount_path + 'graphsense_labels.csv', 'w', newline='') as file:
-            writer = csv.writer(file, delimiter=DELIMITER)
-            writer.writerows(graphsense_labels)
+        store_csv('graphsense_labels.csv', graphsense_labels)
     graphsense_labels.clear()
 
 def export_csv(file_name):
