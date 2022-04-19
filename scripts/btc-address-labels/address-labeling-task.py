@@ -513,6 +513,9 @@ def main():
         # apply tmp table schema in GP
         apply_sql_query(open("dependencies/address_label_table_schema.sql", "r").read())
 
+        # remove existing indexes
+        execute_sql_query("SELECT remove_btc_address_label_indexes();")
+
         # load last processed timestamp
         global last_timestamp
         last_timestamp = load_last_processed_timestamp()
@@ -588,6 +591,8 @@ def main():
         get_graphsense_labels();
         if graphsense_csv.exists():
             export_csv(graphsense_csv)
+
+        execute_sql_query("SELECT enrich_btc_address_label();")
 
     except Exception as e:
         error_message = str(e)
