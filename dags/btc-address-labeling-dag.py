@@ -44,6 +44,8 @@ with models.DAG(
         image_pull_policy='Always',
         namespace='airflow-cluster',
         task_id="btc_address_labeling_job",
+        volumes=[volume],
+        volume_mounts=[volume_mount],
         do_xcom_push=False,
     )
 
