@@ -7,6 +7,7 @@ import pickle
 import logging
 import time
 from pathlib import Path
+from tqdm import tqdm
 from elasticsearch import Elasticsearch
 
 es = Elasticsearch(
@@ -16,8 +17,9 @@ es = Elasticsearch(
 gp_connection = None
 gp_cursor = None
 last_timestamp = 0
-volume_mount_path = '/opt/airflow/dags/'
+volume_mount_path = '/Users/sajithaliyanage/Desktop/'
 STEP_SIZE = 10000
+DELIMITER = chr(255)
 
 # Data structures to store labels
 darkweb_labels = list()
@@ -224,7 +226,7 @@ def get_darkweb_labels():
     load_darkweb_labels(resp)
 
     try:
-        for step in range(STEP_SIZE, resp['hits']['total']['value'], STEP_SIZE):
+        for step in tqdm(range(STEP_SIZE, resp['hits']['total']['value'], STEP_SIZE)):
             resp = es.scroll(scroll_id=scroll_id, scroll='1m')
             scroll_id = resp['_scroll_id']
             load_darkweb_labels(resp)      
@@ -234,7 +236,7 @@ def get_darkweb_labels():
     # store labels
     if len(darkweb_labels) > 0:
         with open(volume_mount_path + 'darkweb_labels.csv', 'w', newline='') as file:
-            writer = csv.writer(file)
+            writer = csv.writer(file, delimiter=DELIMITER)
             writer.writerows(darkweb_labels)
     darkweb_labels.clear()
 
@@ -260,7 +262,7 @@ def get_walletexplorer_labels():
     load_walletexplorer_labels(resp)
 
     try:
-        for step in range(STEP_SIZE, resp['hits']['total']['value'], STEP_SIZE):
+        for step in tqdm(range(STEP_SIZE, resp['hits']['total']['value'], STEP_SIZE)):
             resp = es.scroll(scroll_id=scroll_id, scroll='1m')
             scroll_id = resp['_scroll_id']
             load_walletexplorer_labels(resp)      
@@ -270,7 +272,7 @@ def get_walletexplorer_labels():
     # store labels
     if len(walletexplorer_labels) > 0:
         with open(volume_mount_path + 'walletexplorer_labels.csv', 'w', newline='') as file:
-            writer = csv.writer(file)
+            writer = csv.writer(file, delimiter=DELIMITER)
             writer.writerows(walletexplorer_labels)
     walletexplorer_labels.clear()
 
@@ -296,7 +298,7 @@ def get_twitter_labels():
     load_twitter_labels(resp)
 
     try:
-        for step in range(STEP_SIZE, resp['hits']['total']['value'], STEP_SIZE):
+        for step in tqdm(range(STEP_SIZE, resp['hits']['total']['value'], STEP_SIZE)):
             resp = es.scroll(scroll_id=scroll_id, scroll='1m')
             scroll_id = resp['_scroll_id']
             load_twitter_labels(resp)      
@@ -306,7 +308,7 @@ def get_twitter_labels():
     # store labels
     if len(twitter_labels) > 0:
         with open(volume_mount_path + 'twitter_labels.csv', 'w', newline='') as file:
-            writer = csv.writer(file)
+            writer = csv.writer(file, delimiter=DELIMITER)
             writer.writerows(twitter_labels)
     twitter_labels.clear()
 
@@ -337,7 +339,7 @@ def get_bitcointalk_labels():
     load_bitcointalk_labels(resp)
 
     try:
-        for step in range(STEP_SIZE, resp['hits']['total']['value'], STEP_SIZE):
+        for step in tqdm(range(STEP_SIZE, resp['hits']['total']['value'], STEP_SIZE)):
             resp = es.scroll(scroll_id=scroll_id, scroll='1m')
             scroll_id = resp['_scroll_id']
             load_bitcointalk_labels(resp)      
@@ -347,7 +349,7 @@ def get_bitcointalk_labels():
     # store labels
     if len(bitcointalk_labels) > 0:
         with open(volume_mount_path + 'bitcointalk_labels.csv', 'w', newline='') as file:
-            writer = csv.writer(file)
+            writer = csv.writer(file, delimiter=DELIMITER)
             writer.writerows(bitcointalk_labels)
     bitcointalk_labels.clear()
 
@@ -373,7 +375,7 @@ def get_bitcoinabuse_labels():
     load_bitcoinabuse_labels(resp)
 
     try:
-        for step in range(STEP_SIZE, resp['hits']['total']['value'], STEP_SIZE):
+        for step in tqdm(range(STEP_SIZE, resp['hits']['total']['value'], STEP_SIZE)):
             resp = es.scroll(scroll_id=scroll_id, scroll='1m')
             scroll_id = resp['_scroll_id']
             load_bitcoinabuse_labels(resp)      
@@ -383,7 +385,7 @@ def get_bitcoinabuse_labels():
     # store labels
     if len(bitcoinabuse_labels) > 0:
         with open(volume_mount_path + 'bitcoinabuse_labels.csv', 'w', newline='') as file:
-            writer = csv.writer(file)
+            writer = csv.writer(file, delimiter=DELIMITER)
             writer.writerows(bitcoinabuse_labels)
     bitcoinabuse_labels.clear()
 
@@ -409,7 +411,7 @@ def get_splcenter_labels():
     load_splcenter_labels(resp)
 
     try:
-        for step in range(STEP_SIZE, resp['hits']['total']['value'], STEP_SIZE):
+        for step in tqdm(range(STEP_SIZE, resp['hits']['total']['value'], STEP_SIZE)):
             resp = es.scroll(scroll_id=scroll_id, scroll='1m')
             scroll_id = resp['_scroll_id']
             load_splcenter_labels(resp)      
@@ -419,7 +421,7 @@ def get_splcenter_labels():
     # store labels
     if len(splcenter_labels) > 0:
         with open(volume_mount_path + 'splcenter_labels.csv', 'w', newline='') as file:
-            writer = csv.writer(file)
+            writer = csv.writer(file, delimiter=DELIMITER)
             writer.writerows(splcenter_labels)
     splcenter_labels.clear()
 
@@ -445,7 +447,7 @@ def get_github_labels():
     load_github_labels(resp)
 
     try:
-        for step in range(STEP_SIZE, resp['hits']['total']['value'], STEP_SIZE):
+        for step in tqdm(range(STEP_SIZE, resp['hits']['total']['value'], STEP_SIZE)):
             resp = es.scroll(scroll_id=scroll_id, scroll='1m')
             scroll_id = resp['_scroll_id']
             load_github_labels(resp)      
@@ -455,7 +457,7 @@ def get_github_labels():
     # store labels
     if len(github_labels) > 0:
         with open(volume_mount_path + 'github_labels.csv', 'w', newline='') as file:
-            writer = csv.writer(file)
+            writer = csv.writer(file, delimiter=DELIMITER)
             writer.writerows(github_labels)
     github_labels.clear()
 
@@ -481,7 +483,7 @@ def get_graphsense_labels():
     load_graphsense_labels(resp)
 
     try:
-        for step in range(STEP_SIZE, resp['hits']['total']['value'], STEP_SIZE):
+        for step in tqdm(range(STEP_SIZE, resp['hits']['total']['value'], STEP_SIZE)):
             resp = es.scroll(scroll_id=scroll_id, scroll='1m')
             scroll_id = resp['_scroll_id']
             load_graphsense_labels(resp)      
@@ -491,9 +493,15 @@ def get_graphsense_labels():
     # store labels
     if len(graphsense_labels) > 0:
         with open(volume_mount_path + 'graphsense_labels.csv', 'w', newline='') as file:
-            writer = csv.writer(file)
+            writer = csv.writer(file, delimiter=DELIMITER)
             writer.writerows(graphsense_labels)
     graphsense_labels.clear()
+
+def export_csv(file_name):
+    reader = open(file_name, 'r')
+    gp_cursor.copy_from(reader, 'btc_address_label', sep=DELIMITER, columns=['address', 'label', 'category', 'source', 'timestamp', 'note'])
+    reader.close()
+    gp_connection.commit()
 
 def main():
     if not gp_connection or not gp_cursor:
@@ -515,8 +523,7 @@ def main():
             os.remove(darkweb_csv)
         get_darkweb_labels();
         if darkweb_csv.exists():
-            apply_sql_query("\\COPY btc_address_label(address, label, category, source, timestamp, note) FROM " 
-            + volume_mount_path + "darkweb_labels.csv CSV DELIMITER E','")
+            export_csv(darkweb_csv)
 
         # get walletexplorer labels
         logging.info("Processing walletexplorer labels.")
@@ -525,8 +532,7 @@ def main():
             os.remove(walletexplorer_csv)
         get_walletexplorer_labels();
         if walletexplorer_csv.exists():
-            apply_sql_query("\\COPY btc_address_label(address, label, category, source, timestamp, note) FROM " 
-            + volume_mount_path + "walletexplorer_labels.csv CSV DELIMITER E','")
+            export_csv(walletexplorer_csv)
 
         # get twitter labels
         logging.info("Processing twitter labels.")
@@ -535,8 +541,7 @@ def main():
             os.remove(twitter_csv)
         get_twitter_labels();
         if twitter_csv.exists():
-            apply_sql_query("\\COPY btc_address_label(address, label, category, source, timestamp, note) FROM " 
-            + volume_mount_path + "twitter_labels.csv CSV DELIMITER E','")
+            export_csv(twitter_csv)
 
         # get bitcointalk labels
         logging.info("Processing bitcointalk labels.")
@@ -545,8 +550,7 @@ def main():
             os.remove(bitcointalk_csv)
         get_bitcointalk_labels();
         if bitcointalk_csv.exists():
-            apply_sql_query("\\COPY btc_address_label(address, label, category, source, timestamp, note) FROM " 
-            + volume_mount_path + "bitcointalk_labels.csv CSV DELIMITER E','")
+            export_csv(bitcointalk_csv)
 
         # get bitcoinabuse labels
         logging.info("Processing bitcoinabuse labels.")
@@ -555,8 +559,7 @@ def main():
             os.remove(bitcoinabuse_csv)
         get_bitcoinabuse_labels();
         if bitcoinabuse_csv.exists():
-            apply_sql_query("\\COPY btc_address_label(address, label, category, source, timestamp, note) FROM " 
-            + volume_mount_path + "bitcoinabuse_labels.csv CSV DELIMITER E','")
+            export_csv(bitcoinabuse_csv)
 
         # get splcenter labels
         logging.info("Processing splcenter labels.")
@@ -565,8 +568,7 @@ def main():
             os.remove(splcenter_csv)
         get_splcenter_labels();
         if splcenter_csv.exists():
-            apply_sql_query("\\COPY btc_address_label(address, label, category, source, timestamp, note) FROM " 
-            + volume_mount_path + "splcenter_labels.csv CSV DELIMITER E','")
+            export_csv(splcenter_csv)
 
         # get github labels
         logging.info("Processing github labels.")
@@ -575,8 +577,7 @@ def main():
             os.remove(github_csv)
         get_github_labels();
         if github_csv.exists():
-            apply_sql_query("\\COPY btc_address_label(address, label, category, source, timestamp, note) FROM " 
-            + volume_mount_path + "github_labels.csv CSV DELIMITER E','")
+            export_csv(github_csv)
 
         # get graphsense labels
         logging.info("Processing graphsense labels.")
@@ -585,8 +586,7 @@ def main():
             os.remove(graphsense_csv)
         get_graphsense_labels();
         if graphsense_csv.exists():
-            apply_sql_query("\\COPY btc_address_label(address, label, category, source, timestamp, note) FROM " 
-            + volume_mount_path + "graphsense_labels.csv CSV DELIMITER E','")
+            export_csv(graphsense_csv)
 
     except Exception as e:
         error_message = str(e)
