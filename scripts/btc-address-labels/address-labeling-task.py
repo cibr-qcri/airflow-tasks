@@ -9,6 +9,7 @@ import time
 from pathlib import Path
 from tqdm import tqdm
 from elasticsearch import Elasticsearch
+import urllib.parse
 
 es = Elasticsearch(
     ['http://es.cibr.qcri.org:80'],
@@ -19,7 +20,7 @@ gp_cursor = None
 last_timestamp = 0
 volume_mount_path = '/Users/sajithaliyanage/Desktop/'
 STEP_SIZE = 10000
-DELIMITER = chr(255)
+DELIMITER = ','
 
 # Data structures to store labels
 darkweb_labels = list()
@@ -105,7 +106,7 @@ def load_darkweb_labels(resp):
             current.append("Service > Darkweb > " + response['_source']['data']['info']['domain_info']['category']['type'].capitalize())
             current.append("dizzy.cibr.qcri.org")
             current.append(response['_source']['data']['timestamp'])
-            current.append(response['_source']['data']['info']['url'])
+            current.append(urllib.parse.quote(response['_source']['data']['info']['url']))
             darkweb_labels.append(current)
 
 def load_walletexplorer_labels(resp):
@@ -116,7 +117,7 @@ def load_walletexplorer_labels(resp):
         current.append(response['_source']['data']['info']['tags']['wallet']['category'])
         current.append("walletexplorer.com")
         current.append(response['_source']['data']['timestamp'])
-        current.append(response['_source']['data']['info']['tags']['wallet']['url'])
+        current.append(urllib.parse.quote(response['_source']['data']['info']['tags']['wallet']['url']))
         walletexplorer_labels.append(current)
 
 def load_twitter_labels(resp):
@@ -128,7 +129,7 @@ def load_twitter_labels(resp):
             current.append("User")
             current.append("twitter.com")
             current.append(response['_source']['timestamp'])
-            current.append(response['_source']['info']['url'])
+            current.append(urllib.parse.quote(response['_source']['info']['url']))
             twitter_labels.append(current)
 
 def load_bitcointalk_labels(resp):
@@ -140,7 +141,7 @@ def load_bitcointalk_labels(resp):
             current.append("User")
             current.append("bitcointalk.org")
             current.append(response['_source']['data']['timestamp'])
-            current.append(response['_source']['data']['info']['url'])
+            current.append(urllib.parse.quote(response['_source']['data']['info']['url']))
             bitcointalk_labels.append(current)
 
 def load_bitcoinabuse_labels(resp):
@@ -153,7 +154,7 @@ def load_bitcoinabuse_labels(resp):
             current.append(response['_source']['data']['info']['tags']['abuse']['report']['category'])
             current.append("bitcoinabuse.com")
             current.append(response['_source']['data']['timestamp'])
-            current.append(response['_source']['data']['info']['url'])
+            current.append(urllib.parse.quote(response['_source']['data']['info']['url']))
             bitcoinabuse_labels.append(current)
 
 def load_splcenter_labels(resp):
