@@ -4,7 +4,6 @@ from psycopg2 import Error
 import csv
 import os
 import pickle
-import logging
 import time
 from pathlib import Path
 from tqdm import tqdm
@@ -47,7 +46,7 @@ def connects_to_greenplum():
         gp_cursor = gp_connection.cursor()
         gp_cursor.execute("SELECT version();")
         record = gp_cursor.fetchone()
-        logging.info("You are connected to - ", record, "\n")
+        print("You are connected to - ", record, "\n")
         return
 
     except (Exception, Error) as error:
@@ -58,14 +57,14 @@ def close_gp_connection():
         if (gp_connection):
             gp_cursor.close()
             gp_connection.close()
-            logging.info("PostgreSQL connection is closed")
+            print("PostgreSQL connection is closed")
     except (Exception, Error) as error:
-        logging.info("Error while closing the connection to PostgreSQL", error)
+        print("Error while closing the connection to PostgreSQL", error)
 
 def apply_sql_query(query):
     gp_cursor.execute(query)
     gp_connection.commit()
-    logging.info("Record applied successfully ")
+    print("Record applied successfully ")
 
 def execute_sql_query(query):
     gp_cursor.execute(query)
@@ -489,6 +488,7 @@ def get_graphsense_labels():
     graphsense_labels.clear()
 
 def export_csv(file_name):
+    print("Exporting csv data in : " + file_name)
     reader = open(file_name, 'r')
     gp_cursor.copy_from(reader, 'btc_address_label', sep=DELIMITER, columns=['address', 'label', 'category', 'source', 'timestamp', 'note'])
     reader.close()
@@ -511,7 +511,7 @@ def main():
         last_timestamp = load_last_processed_timestamp()
 
         # get darkweb labels
-        logging.info("Processing darkweb labels.")
+        print("Processing darkweb labels.")
         darkweb_csv = Path(volume_mount_path + "darkweb_labels.csv")
         if darkweb_csv.exists():
             os.remove(darkweb_csv)
@@ -520,7 +520,7 @@ def main():
             export_csv(darkweb_csv)
 
         # get walletexplorer labels
-        logging.info("Processing walletexplorer labels.")
+        print("Processing walletexplorer labels.")
         walletexplorer_csv = Path(volume_mount_path + "walletexplorer_labels.csv")
         if walletexplorer_csv.exists():
             os.remove(walletexplorer_csv)
@@ -529,7 +529,7 @@ def main():
             export_csv(walletexplorer_csv)
 
         # get twitter labels
-        logging.info("Processing twitter labels.")
+        print("Processing twitter labels.")
         twitter_csv = Path(volume_mount_path + "twitter_labels.csv")
         if twitter_csv.exists():
             os.remove(twitter_csv)
@@ -538,7 +538,7 @@ def main():
             export_csv(twitter_csv)
 
         # get bitcointalk labels
-        logging.info("Processing bitcointalk labels.")
+        print("Processing bitcointalk labels.")
         bitcointalk_csv = Path(volume_mount_path + "bitcointalk_labels.csv")
         if bitcointalk_csv.exists():
             os.remove(bitcointalk_csv)
@@ -547,7 +547,7 @@ def main():
             export_csv(bitcointalk_csv)
 
         # get bitcoinabuse labels
-        logging.info("Processing bitcoinabuse labels.")
+        print("Processing bitcoinabuse labels.")
         bitcoinabuse_csv = Path(volume_mount_path + "bitcoinabuse_labels.csv")
         if bitcoinabuse_csv.exists():
             os.remove(bitcoinabuse_csv)
@@ -556,7 +556,7 @@ def main():
             export_csv(bitcoinabuse_csv)
 
         # get splcenter labels
-        logging.info("Processing splcenter labels.")
+        print("Processing splcenter labels.")
         splcenter_csv = Path(volume_mount_path + "splcenter_labels.csv")
         if splcenter_csv.exists():
             os.remove(splcenter_csv)
@@ -565,7 +565,7 @@ def main():
             export_csv(splcenter_csv)
 
         # get github labels
-        logging.info("Processing github labels.")
+        print("Processing github labels.")
         github_csv = Path(volume_mount_path + "github_labels.csv")
         if github_csv.exists():
             os.remove(github_csv)
@@ -574,7 +574,7 @@ def main():
             export_csv(github_csv)
 
         # get graphsense labels
-        logging.info("Processing graphsense labels.")
+        print("Processing graphsense labels.")
         graphsense_csv = Path(volume_mount_path + "graphsense_labels.csv")
         if graphsense_csv.exists():
             os.remove(graphsense_csv)

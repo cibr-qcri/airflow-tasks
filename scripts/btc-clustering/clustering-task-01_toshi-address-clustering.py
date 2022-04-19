@@ -10,7 +10,7 @@ import logging
 gp_connection = None
 gp_cursor = None
 last_processed_input_id = 0
-processing_row_count = 100
+processing_row_count = 10000000
 last_processed_tx_hash = None
 last_processed_tx_wallet_id = None
 volume_mount_path = '/opt/airflow/dags/'
@@ -59,15 +59,15 @@ def multi_address__clustering_heuristic():
     global last_processed_tx_hash
     global last_processed_tx_wallet_id
 
-    #total_addresses = execute_sql_query("SELECT max(id) from btc_tx_input;")
-    start_index = 0
-    end_index = last_processed_input_id + 100
+    total_addresses = execute_sql_query("SELECT max(id) from btc_tx_input;")
+    start_index = last_processed_input_id
+    end_index = int(total_addresses[0][0])
 
     while start_index <= end_index:
         logging.info("Query input address range {} - {}".format(start_index, start_index+processing_row_count))
 
         # Gets all the input addresses stored
-        query = "SELECT id, tx_hash, address, tx_value from btc_tx_input where id > {} and id <= {} order by id asc;".format(last_processed_input_id, int(last_processed_input_id + processing_row_count))
+        query = "SELECT id, tx_hash, address, tx_value from btc_tx_input where id > {} and id <= {} order by id asc;".format(start_index, int(start_index + processing_row_count))
         logging.info(query)
         tx_inputs = execute_sql_query(query)
         fetched_tx_count = len(tx_inputs)
