@@ -1,5 +1,6 @@
 import datetime
 
+from kubernetes import client
 from airflow import models
 from airflow.providers.cncf.kubernetes.operators.kubernetes_pod import KubernetesPodOperator
 from airflow.kubernetes.volume import Volume
@@ -47,6 +48,10 @@ with models.DAG(
         do_xcom_push=False,
         volumes=[volume],
         volume_mounts=[volume_mount],
+        resources = client.V1ResourceRequirements(
+            requests={"memory": "30G"},
+            limits={"memory": "94G"}
+        ),
         is_delete_operator_pod=False
     )
 
@@ -59,6 +64,10 @@ with models.DAG(
         do_xcom_push=False,
         volumes=[volume],
         volume_mounts=[volume_mount],
+        resources = client.V1ResourceRequirements(
+            requests={"memory": "30G"},
+            limits={"memory": "94G"}
+        ),
         is_delete_operator_pod=False
     )
 
