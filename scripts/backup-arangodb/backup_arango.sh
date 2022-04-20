@@ -1,3 +1,5 @@
+#!/bin/sh
+
 arangodump \
   --server.endpoint "tcp://$ARANGO_HOST:$ARANGO_PORT" \
   --server.username "$ARANGO_USERNAME" \
