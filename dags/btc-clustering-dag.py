@@ -20,7 +20,7 @@ volume_config = {
     }
 }
 volume = Volume(name='toshi-airflow-pvc', configs=volume_config)
-#         resources={"request_cpu" :"4", "request_memory": "8G", "limit_cpu": "4", "limit_memory": "60G"},
+
 def failure_end_job():
     print("BTC wallet clustering job failed")
 
