@@ -49,8 +49,8 @@ with models.DAG(
         volumes=[volume],
         volume_mounts=[volume_mount],
         resources = client.V1ResourceRequirements(
-            requests={"memory": "30G"},
-            limits={"memory": "70G"}
+            requests={"cpu": "4000m", "memory": "30G"},
+            limits={"cpu": "10000m", "memory": "54G"}
         ),
         is_delete_operator_pod=False
     )
@@ -65,8 +65,8 @@ with models.DAG(
         volumes=[volume],
         volume_mounts=[volume_mount],
         resources = client.V1ResourceRequirements(
-            requests={"memory": "30G"},
-            limits={"memory": "70G"}
+            requests={"cpu": "4000m", "memory": "30G"},
+            limits={"cpu": "10000m", "memory": "54G"}
         ),
         is_delete_operator_pod=False
     )
