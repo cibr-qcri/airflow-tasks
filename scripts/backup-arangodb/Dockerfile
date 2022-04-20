@@ -9,6 +9,8 @@ ENV ARANGO_HOST=$arango_host
 ENV ARANGO_PORT=$arango_port
 ENV ARANGO_USERNAME=$arango_username
 
-COPY backup_arango.sh ./backup_arango.sh
+COPY backup_arango.sh /backup_arango.sh
 
-CMD ["./backup_arango.sh"]
+RUN chmod 755 /backup_arango.sh
+
+ENTRYPOINT ["/backup_arango.sh"]
