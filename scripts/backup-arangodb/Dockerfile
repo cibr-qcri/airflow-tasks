@@ -11,6 +11,6 @@ ENV ARANGO_USERNAME=$arango_username
 
 COPY backup_arango.sh /backup_arango.sh
 
-RUN chmod 755 /backup_arango.sh
+RUN chmod +x /backup_arango.sh
 
 ENTRYPOINT ["/backup_arango.sh"]
