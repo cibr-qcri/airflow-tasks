@@ -110,7 +110,7 @@ def load_darkweb_labels(resp):
                 current.append(response['_source']['data']['timestamp'])
                 current.append(urllib.parse.quote(response['_source']['data']['info']['url']))
                 darkweb_labels.append(current)
-                document_id_map[document_id] = "added"
+            document_id_map[document_id] = "added"
 
 def load_walletexplorer_labels(resp):
     for response in resp['hits']['hits']:
@@ -120,7 +120,7 @@ def load_walletexplorer_labels(resp):
             current = list()
             current.append(response['_source']['data']['info']['tags']['cryptocurrency']['address']['btc'])
             current.append(response['_source']['data']['info']['tags']['wallet']['name'])
-            current.append(response['_source']['data']['info']['tags']['wallet']['categroy'])
+            current.append(response['_source']['data']['info']['tags']['wallet']['category'])
             current.append("walletexplorer.com")
             current.append(response['_source']['data']['timestamp'])
             current.append(urllib.parse.quote(response['_source']['data']['info']['tags']['wallet']['url']))
@@ -141,7 +141,7 @@ def load_twitter_labels(resp):
                 current.append(response['_source']['timestamp'])
                 current.append(urllib.parse.quote(response['_source']['info']['url']))
                 twitter_labels.append(current)
-                document_id_map[document_id] = "added"
+            document_id_map[document_id] = "added"
 
 def load_bitcointalk_labels(resp):
     for response in resp['hits']['hits']:
@@ -159,7 +159,7 @@ def load_bitcointalk_labels(resp):
                     current.append(response['_source']['data']['timestamp'])
                     current.append(urllib.parse.quote(response['_source']['data']['info']['url']))
                     bitcointalk_labels.append(current)
-                    document_id_map[document_id] = "added"
+            document_id_map[document_id] = "added"
 
 def load_bitcoinabuse_labels(resp):
     for response in resp['hits']['hits']:
@@ -178,7 +178,7 @@ def load_bitcoinabuse_labels(resp):
                     current.append(response['_source']['data']['timestamp'])
                     current.append(urllib.parse.quote(response['_source']['data']['info']['url']))
                     bitcoinabuse_labels.append(current)
-                    document_id_map[document_id] = "added"
+            document_id_map[document_id] = "added"
 
 def load_splcenter_labels(resp):
     for response in resp['hits']['hits']:
@@ -642,6 +642,7 @@ def main():
         if graphsense_csv.exists():
             export_csv(file)
 
+        print("Applying indexes and cluster ids for btc_address_label table")
         execute_sql_query("SELECT enrich_btc_address_label();")
 
     except Exception as e:
