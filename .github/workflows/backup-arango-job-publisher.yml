@@ -28,9 +28,9 @@ jobs:
         uses: jitterbit/get-changed-files@v1
       - name: Build & Push Containers to DockerHub
         run: |
-          cd scripts/btc-address-labels
+          cd scripts/backup-arangodb
           for changed_file in ${{ steps.modified-files.outputs.all }}; do
-            if [[ $changed_file == scripts/btc-address-labels/* ]] ;
+            if [[ $changed_file == scripts/backup-arangodb/* ]] ;
             then
               docker build \
                 --build-arg arango_host=$arango_host \
