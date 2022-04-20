@@ -60,7 +60,7 @@ with models.DAG(
         do_xcom_push=False,
         volumes=[volume],
         volume_mounts=[volume_mount],
-        resources={'request_cpu':'4000m', 'request_memory': '35Gi', 'limit_cpu': '10000m', 'limit_memory': '60Gi'},,
+        resources={'request_cpu':'4000m', 'request_memory': '35Gi', 'limit_cpu': '10000m', 'limit_memory': '60Gi'},
         is_delete_operator_pod=False
     )
 
