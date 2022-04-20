@@ -15,11 +15,9 @@ volume_mount = VolumeMount(
 )
 
 volume_config = {
-    'volumes': {
-        'name': 'cibr-backup-mount',
-        'hostPath': {
-            'path': '/cibr-dev-data/backups/arangodb'
-        }
+    'name': 'cibr-backup-mount',
+    'hostPath': {
+        'path': '/cibr-dev-data/backups/arangodb'
     }
 }
 volume = Volume(name='cibr-backup-mount', configs=volume_config)
