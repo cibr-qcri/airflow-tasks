@@ -3,7 +3,6 @@ import psycopg2
 from psycopg2 import Error
 from pathlib import Path
 import os
-import logging
 
 gp_connection = None
 gp_cursor = None
@@ -25,7 +24,7 @@ def connects_to_greenplum():
         gp_cursor = gp_connection.cursor()
         gp_cursor.execute("SELECT version();")
         record = gp_cursor.fetchone()
-        logging.info("You are connected to - ", record, "\n")
+        print("You are connected to - ", record, "\n")
         return
 
     except (Exception, Error) as error:
@@ -36,18 +35,30 @@ def close_gp_connection():
         if (gp_connection):
             gp_cursor.close()
             gp_connection.close()
-            logging.info("PostgreSQL connection is closed")
+            print("PostgreSQL connection is closed")
     except (Exception, Error) as error:
-        logging.info("Error while closing the connection to PostgreSQL", error)
+        print("Error while closing the connection to PostgreSQL", error)
 
 def apply_sql_query(query):
     gp_cursor.execute(query)
     gp_connection.commit()
-    logging.info("Record applied successfully ")
+    print("Record applied successfully ")
 
 def execute_sql_query(query):
     gp_cursor.execute(query)
     return gp_cursor.fetchall()
+
+def call_procedure(procedure_name):
+    gp_cursor.callproc(procedure_name)
+    gp_connection.commit()
+    return gp_cursor.fetchall()
+
+def export_csv(file_name):
+    print("Exporting clustering csv data in : " + file_name)
+    reader = open(file_name, 'r')
+    gp_cursor.copy_from(reader, 'tmp_btc_address_cluster', sep=',', columns=['address', 'cluster_id'])
+    reader.close()
+    gp_connection.commit()
 
 def main():
     if not gp_connection or not gp_cursor:
@@ -64,19 +75,19 @@ def main():
             sys.exit("enrich functions need clustered csv to proceed.")
 
         # insert address-cluster_id csv in GP
-        apply_sql_query("\\COPY tmp_btc_address_cluster(address, cluster_id) FROM " + volume_mount_path + "address_wallet_mapping.csv CSV DELIMITER E','")
+        export_csv(volume_mount_path + "address_wallet_mapping.csv")
 
         # insert enrich tmp_btc_wallet stored procedure in GP
         apply_sql_query(open(local_file_path + "cluster_wallet_enrich_procedures.sql", "r").read())
-        execute_sql_query("SELECT enrich_tmp_btc_wallet_table();")
+        call_procedure("enrich_tmp_btc_wallet_table")
 
         # insert enrich tmp_btc_address_cluster stored procedure in GP
         apply_sql_query(open(local_file_path + "cluster_address_enrich_procedures.sql", "r").read())
-        execute_sql_query("SELECT enrich_tmp_btc_address_cluster_table();")
+        call_procedure("enrich_tmp_btc_address_cluster_table")
 
         # insert enrich tmp_btc_wallet_transaction stored procedure in GP
         apply_sql_query(open(local_file_path + "cluster_tx_enrich_procedures.sql", "r").read())
-        execute_sql_query("SELECT enrich_btc_wallet_transaction_table();")
+        call_procedure("enrich_btc_wallet_transaction_table")
 
         # apply table indexes in GP
         # apply_sql_query(open(local_file_path + "cluster_table_index.sql", "r").read())

@@ -70,6 +70,11 @@ def execute_sql_query(query):
     gp_cursor.execute(query)
     return gp_cursor.fetchall()
 
+def call_procedure(procedure_name):
+    gp_cursor.callproc(procedure_name)
+    gp_connection.commit()
+    return gp_cursor.fetchall()
+
 def load_wallet_data(dict_name):
     wallet_file = Path(volume_mount_path + dict_name + ".pickle")
     if wallet_file.exists():
@@ -556,7 +561,7 @@ def main():
         apply_sql_query(open("dependencies/address_label_table_schema.sql", "r").read())
 
         # remove existing indexes
-        execute_sql_query("SELECT remove_btc_address_label_indexes();")
+        call_procedure("remove_btc_address_label_indexes")
 
         # load last processed timestamp
         global last_timestamp
@@ -643,7 +648,7 @@ def main():
             export_csv(file)
 
         print("Applying indexes and cluster ids for btc_address_label table")
-        execute_sql_query("SELECT enrich_btc_address_label();")
+        call_procedure("enrich_btc_address_label")
 
     except Exception as e:
         error_message = str(e)
