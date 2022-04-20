@@ -4,15 +4,8 @@ from airflow import models
 from airflow.providers.cncf.kubernetes.operators.kubernetes_pod import KubernetesPodOperator
 from airflow.kubernetes.volume import Volume
 from airflow.kubernetes.volume_mount import VolumeMount
-from airflow.contrib.kubernetes.pod import Resources
 
 YESTERDAY = datetime.datetime.now() - datetime.timedelta(days=1)
-
-pod_resources = Resources()
-pod_resources.request_cpu = '4000m'
-pod_resources.request_memory = '35Gi'
-pod_resources.limit_cpu = '10000m'
-pod_resources.limit_memory = '60Gi'
 
 volume_mount = VolumeMount(
     'toshi-airflow-pvc',
@@ -54,7 +47,7 @@ with models.DAG(
         do_xcom_push=False,
         volumes=[volume],
         volume_mounts=[volume_mount],
-        resources=pod_resources,
+        resources={'request_cpu':'4000m', 'request_memory': '35Gi', 'limit_cpu': '10000m', 'limit_memory': '60Gi'},
         is_delete_operator_pod=False
     )
 
@@ -67,7 +60,7 @@ with models.DAG(
         do_xcom_push=False,
         volumes=[volume],
         volume_mounts=[volume_mount],
-        resources=pod_resources,
+        resources={'request_cpu':'4000m', 'request_memory': '35Gi', 'limit_cpu': '10000m', 'limit_memory': '60Gi'},,
         is_delete_operator_pod=False
     )
 
