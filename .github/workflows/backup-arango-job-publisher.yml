@@ -36,7 +36,7 @@ jobs:
                 --build-arg arango_host=$arango_host \
                 --build-arg arango_port=$arango_port \
                 --build-arg arango_username=$arango_username \
-                -t "toshiqcri/btc-address-labels:latest" \
+                -t "toshiqcri/backup-arangodb:latest" \
                 --no-cache .
 
               docker push "toshiqcri/backup-arangodb:latest"
