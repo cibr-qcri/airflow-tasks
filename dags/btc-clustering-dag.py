@@ -62,17 +62,17 @@ with models.DAG(
         is_delete_operator_pod=False
     )
 
-    task_enrich_tables = KubernetesPodOperator(
-        name="btc_enrich_tables_job",
-        image='toshiqcri/clustering-task-03:latest',
-        image_pull_policy='Always',
-        namespace='airflow-cluster',
-        task_id="btc_enrich_tables_job",
-        do_xcom_push=False,
-        volumes=[volume],
-        volume_mounts=[volume_mount],
-        is_delete_operator_pod=False
-    )
+    # task_enrich_tables = KubernetesPodOperator(
+    #     name="btc_enrich_tables_job",
+    #     image='toshiqcri/clustering-task-03:latest',
+    #     image_pull_policy='Always',
+    #     namespace='airflow-cluster',
+    #     task_id="btc_enrich_tables_job",
+    #     do_xcom_push=False,
+    #     volumes=[volume],
+    #     volume_mounts=[volume_mount],
+    #     is_delete_operator_pod=False
+    # )
 
-task_clustering >> task_cluster_mapping >> task_enrich_tables
+task_clustering >> task_cluster_mapping
 
