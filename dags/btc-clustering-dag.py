@@ -21,6 +21,29 @@ volume_config = {
 }
 volume = Volume(name='toshi-airflow-pvc', configs=volume_config)
 
+affinity = {
+    "nodeAffinity": {
+      "requiredDuringSchedulingIgnoredDuringExecution": [
+        {
+          "nodeSelectorTerms": {
+            "matchExpressions": {
+              "key": "kubernetes.io/hostname",
+              "operator": "In",
+              "values": ["cybubcibrdev001"]
+            }
+          }
+        }
+      ]
+    }
+}
+
+resources = { 
+    "request_cpu" :"4", 
+    "request_memory": "8G", 
+    "limit_cpu": "4", 
+    "limit_memory": "60G"
+}
+
 def failure_end_job():
     print("BTC wallet clustering job failed")
 
@@ -47,6 +70,7 @@ with models.DAG(
         do_xcom_push=False,
         volumes=[volume],
         volume_mounts=[volume_mount],
+        affinity=affinity,
         is_delete_operator_pod=False
     )
 
@@ -59,10 +83,10 @@ with models.DAG(
         do_xcom_push=False,
         volumes=[volume],
         volume_mounts=[volume_mount],
+        affinity=affinity,
         is_delete_operator_pod=False
     )
 
-# resources={"request_cpu" :"4", "request_memory": "8G", "limit_cpu": "4", "limit_memory": "60G"},
     # task_enrich_tables = KubernetesPodOperator(
     #     name="btc_enrich_tables_job",
     #     image='toshiqcri/clustering-task-03:latest',
