@@ -9,7 +9,7 @@ import os
 gp_connection = None
 gp_cursor = None
 last_processed_input_id = 0
-processing_row_count = 10000000
+processing_row_count = 5000000
 last_processed_tx_hash = None
 last_processed_tx_wallet_id = None
 volume_mount_path = '/opt/airflow/dags/'
