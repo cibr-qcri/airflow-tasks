@@ -110,6 +110,7 @@ def load_darkweb_labels(resp):
                 current.append(response['_source']['data']['timestamp'])
                 current.append(urllib.parse.quote(response['_source']['data']['info']['url']))
                 darkweb_labels.append(current)
+                document_id_map[document_id] = "added"
 
 def load_walletexplorer_labels(resp):
     for response in resp['hits']['hits']:
@@ -124,6 +125,7 @@ def load_walletexplorer_labels(resp):
             current.append(response['_source']['data']['timestamp'])
             current.append(urllib.parse.quote(response['_source']['data']['info']['tags']['wallet']['url']))
             walletexplorer_labels.append(current)
+            document_id_map[document_id] = "added"
 
 def load_twitter_labels(resp):
     for response in resp['hits']['hits']:
@@ -139,6 +141,7 @@ def load_twitter_labels(resp):
                 current.append(response['_source']['timestamp'])
                 current.append(urllib.parse.quote(response['_source']['info']['url']))
                 twitter_labels.append(current)
+                document_id_map[document_id] = "added"
 
 def load_bitcointalk_labels(resp):
     for response in resp['hits']['hits']:
@@ -156,6 +159,7 @@ def load_bitcointalk_labels(resp):
                     current.append(response['_source']['data']['timestamp'])
                     current.append(urllib.parse.quote(response['_source']['data']['info']['url']))
                     bitcointalk_labels.append(current)
+                    document_id_map[document_id] = "added"
 
 def load_bitcoinabuse_labels(resp):
     for response in resp['hits']['hits']:
@@ -174,6 +178,7 @@ def load_bitcoinabuse_labels(resp):
                     current.append(response['_source']['data']['timestamp'])
                     current.append(urllib.parse.quote(response['_source']['data']['info']['url']))
                     bitcoinabuse_labels.append(current)
+                    document_id_map[document_id] = "added"
 
 def load_splcenter_labels(resp):
     for response in resp['hits']['hits']:
@@ -188,6 +193,7 @@ def load_splcenter_labels(resp):
             current.append(response['_source']['data']['timestamp'])
             current.append(response['_source']['data']['info']['tags']['report']['report']['note'])
             splcenter_labels.append(current)
+            document_id_map[document_id] = "added"
 
 def load_github_labels(resp):
     for response in resp['hits']['hits']:
@@ -202,6 +208,7 @@ def load_github_labels(resp):
             current.append(response['_source']['data']['timestamp'])
             current.append(response['_source']['data']['info']['tags']['repository']['note'].replace(",", ""))
             github_labels.append(current)
+            document_id_map[document_id] = "added"
 
 def load_graphsense_labels(resp):
     for response in resp['hits']['hits']:
@@ -216,6 +223,7 @@ def load_graphsense_labels(resp):
             current.append(response['_source']['data']['timestamp'])
             current.append(response['_source']['data']['info']['tags']['note'])
             graphsense_labels.append(current)
+            document_id_map[document_id] = "added"
 
 def store_csv(file_name, label_list):
     csv_file = volume_mount_path + file_name
@@ -545,14 +553,14 @@ def main():
     error_message = None
     try:
         # apply tmp table schema in GP
-        # apply_sql_query(open("dependencies/address_label_table_schema.sql", "r").read())
+        apply_sql_query(open("dependencies/address_label_table_schema.sql", "r").read())
 
-        # # remove existing indexes
-        # execute_sql_query("SELECT remove_btc_address_label_indexes();")
+        # remove existing indexes
+        execute_sql_query("SELECT remove_btc_address_label_indexes();")
 
-        # # load last processed timestamp
-        # global last_timestamp
-        # last_timestamp = load_last_processed_timestamp()
+        # load last processed timestamp
+        global last_timestamp
+        last_timestamp = load_last_processed_timestamp()
 
         # get darkweb labels
         print("Processing darkweb labels.")
@@ -561,80 +569,80 @@ def main():
         if darkweb_csv.exists():
             os.remove(darkweb_csv)
         get_darkweb_labels();
-        # if darkweb_csv.exists():
-        #     export_csv(file)
+        if darkweb_csv.exists():
+            export_csv(file)
 
-        # # get walletexplorer labels
-        # print("Processing walletexplorer labels.")
-        # file = volume_mount_path + "walletexplorer_labels.csv"
-        # walletexplorer_csv = Path(file)
-        # if walletexplorer_csv.exists():
-        #     os.remove(walletexplorer_csv)
-        # get_walletexplorer_labels();
-        # if walletexplorer_csv.exists():
-        #     export_csv(file)
+        # get walletexplorer labels
+        print("Processing walletexplorer labels.")
+        file = volume_mount_path + "walletexplorer_labels.csv"
+        walletexplorer_csv = Path(file)
+        if walletexplorer_csv.exists():
+            os.remove(walletexplorer_csv)
+        get_walletexplorer_labels();
+        if walletexplorer_csv.exists():
+            export_csv(file)
 
-        # # get twitter labels
-        # print("Processing twitter labels.")
-        # file = volume_mount_path + "twitter_labels.csv"
-        # twitter_csv = Path(file)
-        # if twitter_csv.exists():
-        #     os.remove(twitter_csv)
-        # get_twitter_labels();
-        # if twitter_csv.exists():
-        #     export_csv(file)
+        # get twitter labels
+        print("Processing twitter labels.")
+        file = volume_mount_path + "twitter_labels.csv"
+        twitter_csv = Path(file)
+        if twitter_csv.exists():
+            os.remove(twitter_csv)
+        get_twitter_labels();
+        if twitter_csv.exists():
+            export_csv(file)
 
-        # # get bitcointalk labels
-        # print("Processing bitcointalk labels.")
-        # file = volume_mount_path + "bitcointalk_labels.csv"
-        # bitcointalk_csv = Path(file)
-        # if bitcointalk_csv.exists():
-        #     os.remove(bitcointalk_csv)
-        # get_bitcointalk_labels();
-        # if bitcointalk_csv.exists():
-        #     export_csv(file)
+        # get bitcointalk labels
+        print("Processing bitcointalk labels.")
+        file = volume_mount_path + "bitcointalk_labels.csv"
+        bitcointalk_csv = Path(file)
+        if bitcointalk_csv.exists():
+            os.remove(bitcointalk_csv)
+        get_bitcointalk_labels();
+        if bitcointalk_csv.exists():
+            export_csv(file)
 
-        # # get bitcoinabuse labels
-        # print("Processing bitcoinabuse labels.")
-        # file = volume_mount_path + "bitcoinabuse_labels.csv"
-        # bitcoinabuse_csv = Path(file)
-        # if bitcoinabuse_csv.exists():
-        #     os.remove(bitcoinabuse_csv)
-        # get_bitcoinabuse_labels();
-        # if bitcoinabuse_csv.exists():
-        #     export_csv(file)
+        # get bitcoinabuse labels
+        print("Processing bitcoinabuse labels.")
+        file = volume_mount_path + "bitcoinabuse_labels.csv"
+        bitcoinabuse_csv = Path(file)
+        if bitcoinabuse_csv.exists():
+            os.remove(bitcoinabuse_csv)
+        get_bitcoinabuse_labels();
+        if bitcoinabuse_csv.exists():
+            export_csv(file)
 
-        # # get splcenter labels
-        # print("Processing splcenter labels.")
-        # file = volume_mount_path + "splcenter_labels.csv"
-        # splcenter_csv = Path(file)
-        # if splcenter_csv.exists():
-        #     os.remove(splcenter_csv)
-        # get_splcenter_labels();
-        # if splcenter_csv.exists():
-        #     export_csv(file)
+        # get splcenter labels
+        print("Processing splcenter labels.")
+        file = volume_mount_path + "splcenter_labels.csv"
+        splcenter_csv = Path(file)
+        if splcenter_csv.exists():
+            os.remove(splcenter_csv)
+        get_splcenter_labels();
+        if splcenter_csv.exists():
+            export_csv(file)
 
-        # # get github labels
-        # print("Processing github labels.")
-        # file = volume_mount_path + "github_labels.csv"
-        # github_csv = Path(file)
-        # if github_csv.exists():
-        #     os.remove(github_csv)
-        # get_github_labels();
-        # if github_csv.exists():
-        #     export_csv(file)
+        # get github labels
+        print("Processing github labels.")
+        file = volume_mount_path + "github_labels.csv"
+        github_csv = Path(file)
+        if github_csv.exists():
+            os.remove(github_csv)
+        get_github_labels();
+        if github_csv.exists():
+            export_csv(file)
 
-        # # get graphsense labels
-        # print("Processing graphsense labels.")
-        # file = volume_mount_path + "graphsense_labels.csv"
-        # graphsense_csv = Path(file)
-        # if graphsense_csv.exists():
-        #     os.remove(graphsense_csv)
-        # get_graphsense_labels();
-        # if graphsense_csv.exists():
-        #     export_csv(file)
+        # get graphsense labels
+        print("Processing graphsense labels.")
+        file = volume_mount_path + "graphsense_labels.csv"
+        graphsense_csv = Path(file)
+        if graphsense_csv.exists():
+            os.remove(graphsense_csv)
+        get_graphsense_labels();
+        if graphsense_csv.exists():
+            export_csv(file)
 
-        # execute_sql_query("SELECT enrich_btc_address_label();")
+        execute_sql_query("SELECT enrich_btc_address_label();")
 
     except Exception as e:
         error_message = str(e)
