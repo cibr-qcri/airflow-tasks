@@ -22,6 +22,7 @@ STEP_SIZE = 10000
 DELIMITER = ','
 
 # Data structures to store labels
+document_id_map = dict()
 darkweb_labels = list()
 walletexplorer_labels = list()
 twitter_labels = list()
@@ -98,96 +99,120 @@ def save_processed_timestamp():
 
 def load_darkweb_labels(resp):
     for response in resp['hits']['hits']:
-        for row in response['_source']['data']['info']['cryptocurrency']['btc']:
-            current = list()
-            current.append(row['address'])
-            current.append(str(response['_source']['data']['info']['domain']))
-            current.append("Service > Darkweb > " + response['_source']['data']['info']['domain_info']['category']['type'].capitalize())
-            current.append("dizzy.cibr.qcri.org")
-            current.append(response['_source']['data']['timestamp'])
-            current.append(urllib.parse.quote(response['_source']['data']['info']['url']))
-            darkweb_labels.append(current)
+        document_id = response['_id']
+        is_exists =  document_id_map.get(document_id)
+        if is_exists is None:
+            for row in response['_source']['data']['info']['cryptocurrency']['btc']:
+                current = list()
+                current.append(row['address'])
+                current.append(str(response['_source']['data']['info']['domain']))
+                current.append("Service > Darkweb > " + response['_source']['data']['info']['domain_info']['category']['type'].capitalize())
+                current.append("dizzy.cibr.qcri.org")
+                current.append(response['_source']['data']['timestamp'])
+                current.append(urllib.parse.quote(response['_source']['data']['info']['url']))
+                darkweb_labels.append(current)
 
 def load_walletexplorer_labels(resp):
     for response in resp['hits']['hits']:
-        current = list()
-        current.append(response['_source']['data']['info']['tags']['cryptocurrency']['address']['btc'])
-        current.append(response['_source']['data']['info']['tags']['wallet']['name'])
-        current.append(response['_source']['data']['info']['tags']['wallet']['category'])
-        current.append("walletexplorer.com")
-        current.append(response['_source']['data']['timestamp'])
-        current.append(urllib.parse.quote(response['_source']['data']['info']['tags']['wallet']['url']))
-        walletexplorer_labels.append(current)
+        document_id = response['_id']
+        is_exists =  document_id_map.get(document_id)
+        if is_exists is None:
+            current = list()
+            current.append(response['_source']['data']['info']['tags']['cryptocurrency']['address']['btc'])
+            current.append(response['_source']['data']['info']['tags']['wallet']['name'])
+            current.append(response['_source']['data']['info']['tags']['wallet']['category'])
+            current.append("walletexplorer.com")
+            current.append(response['_source']['data']['timestamp'])
+            current.append(urllib.parse.quote(response['_source']['data']['info']['tags']['wallet']['url']))
+            walletexplorer_labels.append(current)
 
 def load_twitter_labels(resp):
     for response in resp['hits']['hits']:
-        for address in response['_source']['info']['tags']['cryptocurrency']['address']['btc']:
-            current = list()
-            current.append(address)
-            current.append(response['_source']['info']['tags']['actor']['preferred_username'])
-            current.append("User")
-            current.append("twitter.com")
-            current.append(response['_source']['timestamp'])
-            current.append(urllib.parse.quote(response['_source']['info']['url']))
-            twitter_labels.append(current)
+        document_id = response['_id']
+        is_exists =  document_id_map.get(document_id)
+        if is_exists is None:
+            for address in response['_source']['info']['tags']['cryptocurrency']['address']['btc']:
+                current = list()
+                current.append(address)
+                current.append(response['_source']['info']['tags']['actor']['preferred_username'])
+                current.append("User")
+                current.append("twitter.com")
+                current.append(response['_source']['timestamp'])
+                current.append(urllib.parse.quote(response['_source']['info']['url']))
+                twitter_labels.append(current)
 
 def load_bitcointalk_labels(resp):
     for response in resp['hits']['hits']:
-        for address in response['_source']['data']['info']['tags']['cryptocurrency']['address']['btc']:
-            current = list()
-            current.append(address)
-            current.append(response['_source']['data']['info']['tags']['profile']['name'])
-            current.append("User")
-            current.append("bitcointalk.org")
-            current.append(response['_source']['data']['timestamp'])
-            current.append(urllib.parse.quote(response['_source']['data']['info']['url']))
-            bitcointalk_labels.append(current)
+        document_id = response['_id']
+        is_exists =  document_id_map.get(document_id)
+        if is_exists is None:
+            for address in response['_source']['data']['info']['tags']['cryptocurrency']['address']['btc']:
+                current = list()
+                current.append(address)
+                current.append(response['_source']['data']['info']['tags']['profile']['name'])
+                current.append("User")
+                current.append("bitcointalk.org")
+                current.append(response['_source']['data']['timestamp'])
+                current.append(urllib.parse.quote(response['_source']['data']['info']['url']))
+                bitcointalk_labels.append(current)
 
 def load_bitcoinabuse_labels(resp):
     for response in resp['hits']['hits']:
-        abusers = response['_source']['data']['info']['tags']['abuse']['report']['abuser'].split(',')
-        for abuser in abusers:
-            current = list()
-            current.append(response['_source']['data']['info']['tags']['cryptocurrency']['address']['btc'])
-            current.append(abuser)
-            current.append(response['_source']['data']['info']['tags']['abuse']['report']['category'])
-            current.append("bitcoinabuse.com")
-            current.append(response['_source']['data']['timestamp'])
-            current.append(urllib.parse.quote(response['_source']['data']['info']['url']))
-            bitcoinabuse_labels.append(current)
+        document_id = response['_id']
+        is_exists =  document_id_map.get(document_id)
+        if is_exists is None:
+            abusers = response['_source']['data']['info']['tags']['abuse']['report']['abuser'].split(',')
+            for abuser in abusers:
+                current = list()
+                current.append(response['_source']['data']['info']['tags']['cryptocurrency']['address']['btc'])
+                current.append(abuser)
+                current.append(response['_source']['data']['info']['tags']['abuse']['report']['category'])
+                current.append("bitcoinabuse.com")
+                current.append(response['_source']['data']['timestamp'])
+                current.append(urllib.parse.quote(response['_source']['data']['info']['url']))
+                bitcoinabuse_labels.append(current)
 
 def load_splcenter_labels(resp):
     for response in resp['hits']['hits']:
-        current = list()
-        current.append(response['_source']['data']['info']['tags']['cryptocurrency']['address']['btc'])
-        current.append(response['_source']['data']['info']['tags']['report']['report']['label'])
-        current.append(response['_source']['data']['info']['tags']['report']['report']['category'])
-        current.append("splcenter.org")
-        current.append(response['_source']['data']['timestamp'])
-        current.append(response['_source']['data']['info']['tags']['report']['report']['note'])
-        splcenter_labels.append(current)
+        document_id = response['_id']
+        is_exists =  document_id_map.get(document_id)
+        if is_exists is None:
+            current = list()
+            current.append(response['_source']['data']['info']['tags']['cryptocurrency']['address']['btc'])
+            current.append(response['_source']['data']['info']['tags']['report']['report']['label'])
+            current.append(response['_source']['data']['info']['tags']['report']['report']['category'])
+            current.append("splcenter.org")
+            current.append(response['_source']['data']['timestamp'])
+            current.append(response['_source']['data']['info']['tags']['report']['report']['note'])
+            splcenter_labels.append(current)
 
 def load_github_labels(resp):
     for response in resp['hits']['hits']:
-        current = list()
-        current.append(response['_source']['data']['info']['tags']['cryptocurrency']['address']['btc'])
-        current.append(response['_source']['data']['info']['tags']['repository']['name'])
-        current.append(response['_source']['data']['info']['tags']['repository']['category'])
-        current.append("github.com")
-        current.append(response['_source']['data']['timestamp'])
-        current.append(response['_source']['data']['info']['tags']['repository']['note'])
-        github_labels.append(current)
+        document_id = response['_id']
+        is_exists =  document_id_map.get(document_id)
+        if is_exists is None:
+            current = list()
+            current.append(response['_source']['data']['info']['tags']['cryptocurrency']['address']['btc'])
+            current.append(response['_source']['data']['info']['tags']['repository']['name'])
+            current.append(response['_source']['data']['info']['tags']['repository']['category'])
+            current.append("github.com")
+            current.append(response['_source']['data']['timestamp'])
+            current.append(response['_source']['data']['info']['tags']['repository']['note'])
+            github_labels.append(current)
 
 def load_graphsense_labels(resp):
     for response in resp['hits']['hits']:
-        current = list()
-        current.append(response['_source']['data']['info']['tags']['cryptocurrency']['address']['btc'])
-        current.append(response['_source']['data']['info']['tags']['label'])
-        current.append(response['_source']['data']['info']['tags']['category'])
-        current.append("graphsense.info")
-        current.append(response['_source']['data']['timestamp'])
-        current.append(response['_source']['data']['info']['tags']['note'])
-        graphsense_labels.append(current)
+        document_id = response['_id']
+        is_exists =  document_id_map.get(document_id)
+        if is_exists is None:
+            current = list()
+            current.append(response['_source']['data']['info']['tags']['cryptocurrency']['address']['btc'])
+            current.append(response['_source']['data']['info']['tags']['label'])
+            current.append(response['_source']['data']['info']['tags']['category'])
+            current.append("graphsense.info")
+            current.append(response['_source']['data']['timestamp'])
+            current.append(response['_source']['data']['info']['tags']['note'])
+            graphsense_labels.append(current)
 
 def store_csv(file_name, label_list):
     csv_file = volume_mount_path + file_name
@@ -243,6 +268,7 @@ def get_darkweb_labels():
     if len(darkweb_labels) > 0:
         store_csv('darkweb_labels.csv', darkweb_labels)
     darkweb_labels.clear()
+    document_id_map.clear()
 
 def get_walletexplorer_labels():
     resp = es.search(index="cibr-walletexplorer",body={
@@ -277,6 +303,7 @@ def get_walletexplorer_labels():
     if len(walletexplorer_labels) > 0:
         store_csv('walletexplorer_labels.csv', walletexplorer_labels)
     walletexplorer_labels.clear()
+    document_id_map.clear()
 
 def get_twitter_labels():
     resp = es.search(index="twitter-crawler",body={
@@ -311,6 +338,7 @@ def get_twitter_labels():
     if len(twitter_labels) > 0:
         store_csv('twitter_labels.csv', twitter_labels)
     twitter_labels.clear()
+    document_id_map.clear()
 
 def get_bitcointalk_labels():
     resp = es.search(index="bitcointalk-crawler",body={
@@ -350,6 +378,7 @@ def get_bitcointalk_labels():
     if len(bitcointalk_labels) > 0:
         store_csv('bitcointalk_labels.csv', bitcointalk_labels)
     bitcointalk_labels.clear()
+    document_id_map.clear()
 
 def get_bitcoinabuse_labels():
     resp = es.search(index="cibr-bitcoinabuse",body={
@@ -384,6 +413,7 @@ def get_bitcoinabuse_labels():
     if len(bitcoinabuse_labels) > 0:
         store_csv('bitcoinabuse_labels.csv', bitcoinabuse_labels)
     bitcoinabuse_labels.clear()
+    document_id_map.clear()
 
 def get_splcenter_labels():
     resp = es.search(index="cibr-splcenter",body={
@@ -418,6 +448,7 @@ def get_splcenter_labels():
     if len(splcenter_labels) > 0:
         store_csv('splcenter_labels.csv', splcenter_labels)
     splcenter_labels.clear()
+    document_id_map.clear()
 
 def get_github_labels():
     resp = es.search(index="cibr-github",body={
@@ -452,6 +483,7 @@ def get_github_labels():
     if len(github_labels) > 0:
         store_csv('github_labels.csv', github_labels)
     github_labels.clear()
+    document_id_map.clear()
 
 def get_graphsense_labels():
     resp = es.search(index="cibr-graphsense",body={
@@ -486,6 +518,7 @@ def get_graphsense_labels():
     if len(graphsense_labels) > 0:
         store_csv('graphsense_labels.csv', graphsense_labels)
     graphsense_labels.clear()
+    document_id_map.clear()
 
 def export_csv(file_name):
     print("Exporting csv data in : " + file_name)
