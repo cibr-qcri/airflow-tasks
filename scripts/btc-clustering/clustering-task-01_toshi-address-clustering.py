@@ -113,8 +113,8 @@ def multi_address__clustering_heuristic():
             last_processed_input_id = id
             count = count + 1
 
-            if count % 100 == 0:
-                print("Processed another 100 input address, total: ", count)
+            if count % 1000000 == 0:
+                print("Processed another 1000000 input address, total: ", count)
         start_index = start_index + processing_row_count
 
 def save_wallet_data():

@@ -105,8 +105,8 @@ def post_process_wallet_data():
         address_wallet_map[key] = wallet_id
         count = count + 1
 
-        if count % 100000 == 0:
-            print("Processed another 100000 input address, total: ", count)
+        if count % 1000000 == 0:
+            print("Processed another 1000000 input address, total: ", count)
 
     print("Multi address clustering - wallet mapping completed successfully")
 
