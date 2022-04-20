@@ -5,7 +5,6 @@ import uuid
 import pickle
 from pathlib import Path
 import os
-import logging
 
 gp_connection = None
 gp_cursor = None
@@ -37,7 +36,7 @@ def connects_to_greenplum():
         gp_cursor = gp_connection.cursor()
         gp_cursor.execute("SELECT version();")
         record = gp_cursor.fetchone()
-        logging.info("You are connected to - ", record, "\n")
+        print("You are connected to - ", record, "\n")
         return
 
     except (Exception, Error) as error:
@@ -48,9 +47,9 @@ def close_gp_connection():
         if (gp_connection):
             gp_cursor.close()
             gp_connection.close()
-            logging.info("PostgreSQL connection is closed")
+            print("PostgreSQL connection is closed")
     except (Exception, Error) as error:
-        logging.info("Error while closing the connection to PostgreSQL", error)
+        print("Error while closing the connection to PostgreSQL", error)
 
 
 def multi_address__clustering_heuristic():
@@ -64,11 +63,11 @@ def multi_address__clustering_heuristic():
     end_index = int(total_addresses[0][0])
 
     while start_index <= end_index:
-        logging.info("Query input address range {} - {}".format(start_index, start_index+processing_row_count))
+        print("Query input address range {} - {}".format(start_index, start_index+processing_row_count))
 
         # Gets all the input addresses stored
         query = "SELECT id, tx_hash, address, tx_value from btc_tx_input where id > {} and id <= {} order by id asc;".format(start_index, int(start_index + processing_row_count))
-        logging.info(query)
+        print(query)
         tx_inputs = execute_sql_query(query)
         fetched_tx_count = len(tx_inputs)
 
@@ -76,7 +75,7 @@ def multi_address__clustering_heuristic():
         if start_index+processing_row_count < end_index and fetched_tx_count != processing_row_count:
             sys.exit("Error while fetching input addresses from the databse. Hence abort the clustering process")
 
-        logging.info(len(tx_inputs), " - Input addresses loaded from the databse")
+        print(len(tx_inputs), " - Input addresses loaded from the databse")
 
         generated_wallet_id = last_processed_tx_wallet_id
         count = 0
@@ -116,7 +115,7 @@ def multi_address__clustering_heuristic():
             count = count + 1
 
             if count % 100 == 0:
-                logging.info("Processed another 100 input address, total: ", count)
+                print("Processed another 100 input address, total: ", count)
         start_index = start_index + processing_row_count
 
 def save_wallet_data():
@@ -179,21 +178,21 @@ def main():
     if last_processed_input_id != 0:
         global address_wallet_map 
         address_wallet_map = load_wallet_data('address_wallet_map')
-        logging.info('Loaded {0} address_wallet_map entries to the memory'.format(len(address_wallet_map)))
+        print('Loaded {0} address_wallet_map entries to the memory'.format(len(address_wallet_map)))
 
         global wallet_to_wallet_map
         wallet_to_wallet_map = load_wallet_data('wallet_to_wallet_map')
-        logging.info('Loaded {0} wallet_to_wallet_map entries to the memory'.format(len(wallet_to_wallet_map)))
+        print('Loaded {0} wallet_to_wallet_map entries to the memory'.format(len(wallet_to_wallet_map)))
 
         global wallet_temp_map
         wallet_temp_map = load_wallet_data('wallet_temp_map')
-        logging.info('Loaded {0} wallet_temp_map entries to the memory'.format(len(wallet_temp_map)))
+        print('Loaded {0} wallet_temp_map entries to the memory'.format(len(wallet_temp_map)))
 
     if not gp_connection or not gp_cursor:
         connects_to_greenplum()
 
     # process clustering
-    logging.info("Script started to process input address id range: {} to {}".format(last_processed_input_id, last_processed_input_id + processing_row_count))
+    print("Script started to process input address id range: {} to {}".format(last_processed_input_id, last_processed_input_id + processing_row_count))
     multi_address__clustering_heuristic()
 
     # close arangodb connection
@@ -206,7 +205,7 @@ def main():
     clear_data()
 
     # print_wallet_data_structure()
-    logging.info("Multi address clustering process completed successfully")
+    print("Multi address clustering process completed successfully")
 
 if __name__ == "__main__":
     main()
