@@ -3,6 +3,7 @@ import psycopg2
 from psycopg2 import Error
 from pathlib import Path
 import csv
+import os
 import networkx as nx
 
 gp_connection = None
@@ -17,11 +18,11 @@ def connects_to_greenplum():
     try:
         # Connect to an existing database
         global gp_connection
-        gp_connection = psycopg2.connect(user="gpadmin",
-                                    password="",
-                                    host="10.4.8.131",
-                                    port="5432",
-                                    database="btc_blockchain")
+        gp_connection = psycopg2.connect(user=os.getenv('GREENPLUM_USERNAME'),
+                                    password=os.getenv('GREENPLUM_PASSWORD'),
+                                    host=os.getenv('GREENPLUM_HOST'),
+                                    port=os.getenv('GREENPLUM_PORT'),
+                                    database=os.getenv('GREENPLUM_DB'))
 
         # Create a cursor to perform database operations
         global gp_cursor
