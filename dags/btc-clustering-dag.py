@@ -25,13 +25,19 @@ affinity = {
     "nodeAffinity": {
       "requiredDuringSchedulingIgnoredDuringExecution": [
         {
-          "nodeSelectorTerms": {
-            "matchExpressions": {
-              "key": "kubernetes.io/hostname",
-              "operator": "In",
-              "values": ["cybubcibrdev001"]
+          "nodeSelectorTerms": [
+            {
+              "matchExpressions": [
+                {
+                  "key": "kubernetes.io/hostname",
+                  "operator": "In",
+                  "values": [ 
+                    "cybubcibrdev001"
+                  ]
+                }
+              ]
             }
-          }
+          ]
         }
       ]
     }
@@ -83,6 +89,7 @@ with models.DAG(
         do_xcom_push=False,
         volumes=[volume],
         volume_mounts=[volume_mount],
+        affinity=affinity,
         is_delete_operator_pod=False
     )
 
@@ -95,6 +102,7 @@ with models.DAG(
         do_xcom_push=False,
         volumes=[volume],
         volume_mounts=[volume_mount],
+        affinity=affinity,
         is_delete_operator_pod=False
     )
 
@@ -107,6 +115,7 @@ with models.DAG(
         do_xcom_push=False,
         volumes=[volume],
         volume_mounts=[volume_mount],
+        affinity=affinity,
         is_delete_operator_pod=False
     )
 
