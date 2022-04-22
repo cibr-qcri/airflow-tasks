@@ -61,18 +61,18 @@ with models.DAG(
         schedule_interval='@daily',
         default_args=default_dag_args) as dag:
 
-    # task_clustering = KubernetesPodOperator(
-    #     name="btc_clustering_job",
-    #     image='toshiqcri/clustering-task-01:latest',
-    #     image_pull_policy='Always',
-    #     namespace='airflow-cluster',
-    #     task_id="btc_clustering_job",
-    #     do_xcom_push=False,
-    #     volumes=[volume],
-    #     volume_mounts=[volume_mount],
-    #     affinity=affinity,
-    #     is_delete_operator_pod=False
-    # )
+    task_clustering = KubernetesPodOperator(
+        name="btc_clustering_job",
+        image='toshiqcri/clustering-task-01:latest',
+        image_pull_policy='Always',
+        namespace='airflow-cluster',
+        task_id="btc_clustering_job",
+        do_xcom_push=False,
+        volumes=[volume],
+        volume_mounts=[volume_mount],
+        affinity=affinity,
+        is_delete_operator_pod=False
+    )
 
     task_cluster_mapping = KubernetesPodOperator(
         name="btc_cluster_mapping_job",
@@ -86,17 +86,28 @@ with models.DAG(
         is_delete_operator_pod=False
     )
 
-    # task_enrich_tables = KubernetesPodOperator(
-    #     name="btc_enrich_tables_job",
-    #     image='toshiqcri/clustering-task-03:latest',
-    #     image_pull_policy='Always',
-    #     namespace='airflow-cluster',
-    #     task_id="btc_enrich_tables_job",
-    #     do_xcom_push=False,
-    #     volumes=[volume],
-    #     volume_mounts=[volume_mount],
-    #     is_delete_operator_pod=False
-    # )
+    task_enrich_tables = KubernetesPodOperator(
+        name="btc_enrich_tables_job",
+        image='toshiqcri/clustering-task-03:latest',
+        image_pull_policy='Always',
+        namespace='airflow-cluster',
+        task_id="btc_enrich_tables_job",
+        do_xcom_push=False,
+        volumes=[volume],
+        volume_mounts=[volume_mount],
+        is_delete_operator_pod=False
+    )
 
-task_cluster_mapping
+    task_link_wallet_tables = KubernetesPodOperator(
+        name="btc_link_wallet_tables_job",
+        image='toshiqcri/clustering-task-04:latest',
+        image_pull_policy='Always',
+        namespace='airflow-cluster',
+        task_id="btc_link_wallet_tables_job",
+        do_xcom_push=False,
+        volumes=[volume],
+        volume_mounts=[volume_mount],
+        is_delete_operator_pod=False
+    )
 
+task_clustering >> task_cluster_mapping >> task_enrich_tables >> task_link_wallet_tables
