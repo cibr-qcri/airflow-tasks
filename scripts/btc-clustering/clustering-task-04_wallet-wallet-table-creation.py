@@ -8,7 +8,7 @@ import networkx as nx
 
 gp_connection = None
 gp_cursor = None
-volume_mount_path = '/opt/airflow/dags/'
+volume_mount_path = ''
 local_file_path = 'dependencies/'
 MAX_CURSOR_LIMIT = 500000
 G = nx.MultiDiGraph()
@@ -18,11 +18,11 @@ def connects_to_greenplum():
     try:
         # Connect to an existing database
         global gp_connection
-        gp_connection = psycopg2.connect(user=os.getenv('GREENPLUM_USERNAME'),
-                                    password=os.getenv('GREENPLUM_PASSWORD'),
-                                    host=os.getenv('GREENPLUM_HOST'),
-                                    port=os.getenv('GREENPLUM_PORT'),
-                                    database=os.getenv('GREENPLUM_DB'))
+        gp_connection = psycopg2.connect(user="gpadmin",
+                                    password="",
+                                    host="10.4.8.131",
+                                    port="5432",
+                                    database="btc_blockchain")
 
         # Create a cursor to perform database operations
         global gp_cursor
@@ -65,7 +65,10 @@ def export_csv(file_name):
     reader.close()
     gp_connection.commit()
 
-def load_wallet_edges():
+def create_graph(wallet_in, wallet_out, tx_count, out_satoshi_amount, out_usd_amount):
+    G.add_edge(wallet_in,wallet_out, tx_count=tx_count, out_satoshi_amount=out_satoshi_amount, out_usd_amount=out_usd_amount)
+
+def fetch_wallet_edges():
     total_addresses = execute_sql_query("SELECT max(id) from tmp_btc_address_cluster;")
     print("Total addresses: ", total_addresses[0][0])
     start_index = 0
@@ -87,7 +90,7 @@ def load_wallet_edges():
               INNER JOIN btc_tx_output on btc_output_addresses.address=btc_tx_output.address 
             ) as in_wallets 
             on in_wallets.tx_hash=out_wallets.tx_hash;
-            """).format(start_index, start_index+chunk_size, start_index, start_index+chunk_size)
+            """.format(start_index, start_index+chunk_size, start_index, start_index+chunk_size))
             
         print("Query executed for range - {} - {}".format(start_index, start_index+chunk_size))
         fetched_total_count = 0
@@ -101,24 +104,13 @@ def load_wallet_edges():
             with open(volume_mount_path + 'wallet-edges.csv', 'a', newline='') as source:  
                 wtr = csv.writer(source)
                 for record in records:
-                    wtr.writerow(record[0], record[1], record[2], record[3], record[4])
+                    wtr.writerow((record[0], record[1], record[2], record[3], record[4]))
                 source.close()
 
         cursor.close()
         start_index = start_index + chunk_size
 
     print("Wallet edges successfully write into a csv file")
-
-    # create graph
-    with open(volume_mount_path + 'wallet-edges.csv', "r") as source:
-        rdr= csv.reader( source )
-        for r in rdr:
-            create_graph(r[0], r[1], r[2], r[3], r[4])
-
-    print("Wallet grapgh successfully generated")
-
-def create_graph(wallet_in, wallet_out, tx_count, out_satoshi_amount, out_usd_amount):
-    G.add_edge(wallet_in,wallet_out, tx_count=tx_count, out_satoshi_amount=out_satoshi_amount, out_usd_amount=out_usd_amount)
 
 def calculate_connected_nodes():
     print( "Found wallet count from the graph: " + str(len(G.nodes())))
@@ -185,10 +177,22 @@ def generate_linked_wallet_csv():
                 second_cluster_size = wallet_size_map.get(second_wallet)
                 if second_cluster_size is None:
                     second_cluster_size = 0
-                writer.writerow( first_wallet, second_wallet, r[2], r[3], r[4], r[5], r[6], r[7], first_cluster_size, second_cluster_size)
+                writer.writerow( (first_wallet, second_wallet, r[2], r[3], r[4], r[5], r[6], r[7], first_cluster_size, second_cluster_size))
             result.close()
         source.close()
     print("Final Link-Wallet data successfully write into a csv file")
+
+def construct_graph():
+    with open(volume_mount_path + 'wallet-edges.csv', "r") as source:
+        row_count = 0
+        for r in source:
+            create_graph(r[0], r[1], r[2], r[3], r[4])
+            if row_count % 50000000 == 0:
+                print("Processed another 50000000 wallet-wallet edges, total: ", row_count)
+            row_count += 1
+    source.close()
+
+    print("Wallet grapgh successfully generated")
 
 def export_csv(file_name):
     print("Exporting csv data in : " + file_name)
@@ -203,8 +207,12 @@ def main():
 
     error_message = None
     try:
-        # construct wallet-wallet graph and store as a csv
-        load_wallet_edges()
+        # fetch wallet-wallet edges store as a csv
+        #fetch_wallet_edges()
+
+        # construct wallet-wallet graph
+        construct_graph()
+
         calculate_connected_nodes()
         print("Wallet-Wallet data successfully write into a csv file")
 
@@ -219,7 +227,7 @@ def main():
         print("tmp_btc_link_wallet filled with table successfully")
 
         # apply table indexes in GP
-        apply_sql_query(open(local_file_path + "cluster_table_index.sql", "r").read())
+        # apply_sql_query(open(local_file_path + "cluster_table_index.sql", "r").read())
 
     except Exception as e:
         error_message = str(e)

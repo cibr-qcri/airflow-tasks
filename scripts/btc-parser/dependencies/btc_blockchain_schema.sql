@@ -36,7 +36,9 @@ CREATE TABLE IF NOT EXISTS btc_tx_input (
 	address_type varchar(16),
 	tx_value bigint,
 	address varchar(65),
-	usd_value numeric
+	usd_value numeric,
+	block_number integer,
+	timestamp bigint
 );
 
 CREATE TABLE IF NOT EXISTS btc_tx_output (
@@ -47,5 +49,7 @@ CREATE TABLE IF NOT EXISTS btc_tx_output (
 	address_type varchar(16),
 	tx_value bigint,
 	address varchar(65),
-	usd_value numeric
+	usd_value numeric,
+	block_number integer,
+	timestamp bigint
 );

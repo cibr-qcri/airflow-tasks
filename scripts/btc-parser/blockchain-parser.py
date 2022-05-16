@@ -196,6 +196,8 @@ def build_in_addresses(tx):
             in_address.append(tx_input['type'])
             in_address.append(tx_input['value'])
             in_address.append(convert_satoshi_to_usd(tx_input['value'], block_timestamp_map[block_height]))
+            in_address.append(block_height)
+            in_address.append(tx['block_timestamp'])
             in_address_buffer.append(in_address)
 
 
@@ -209,6 +211,8 @@ def build_out_addresses(tx):
             out_address.append(tx_output['type'])
             out_address.append(tx_output['value'])
             out_address.append(convert_satoshi_to_usd(tx_output['value'], block_timestamp_map[block_height]))
+            out_address.append(block_height)
+            out_address.append(tx['block_timestamp'])
             out_address_buffer.append(out_address)
 
 

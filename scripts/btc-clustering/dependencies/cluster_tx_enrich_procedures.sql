@@ -3,7 +3,7 @@ create or replace function enrich_btc_wallet_transaction_table()
 returns void
 as $$
 begin 
-    PERFORM enrich_btc_wallet_transaction();
+    PERFORM create_wallet_transactions();
     raise notice 'Wallet transaction table is enriched!';
 end ;
 $$ language plpgsql;

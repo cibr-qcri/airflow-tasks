@@ -18,8 +18,8 @@ CREATE TABLE tmp_btc_wallet(
 	total_received bigint DEFAULT 0,
 	total_received_usd numeric DEFAULT 0,
 	risk_score float DEFAULT -1,
-	labels text,
-	categories text
+	label text,
+	category text
 );
 
 CREATE TABLE tmp_btc_wallet_transaction(
@@ -27,14 +27,14 @@ CREATE TABLE tmp_btc_wallet_transaction(
 	cluster_id varchar(100),
 	tx_hash varchar(65),
 	block_number integer,
-	input_value bigint,
-	output_value bigint,
+	input_value bigint  DEFAULT 0,
+	output_value bigint  DEFAULT 0,
 	is_coinbase boolean,
-	input_count integer,
-	output_count integer,
+	input_count integer  DEFAULT 0,
+	output_count integer  DEFAULT 0,
 	tx_type varchar(40),
-	input_usd_value numeric,
-	output_usd_value numeric,
+	input_usd_value numeric DEFAULT 0,
+	output_usd_value numeric DEFAULT 0,
 	timestamp bigint
 );
 

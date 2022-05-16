@@ -78,15 +78,15 @@ def main():
         export_csv(volume_mount_path + "address_wallet_mapping.csv")
         print("Clustered addressed inserted to the tmp_btc_address_cluster table")
 
-        # insert enrich tmp_btc_wallet stored procedure in GP
-        apply_sql_query(open(local_file_path + "cluster_wallet_enrich_procedures.sql", "r").read())
-        call_procedure("enrich_tmp_btc_wallet_table")
-        print("Procedure enrich_tmp_btc_wallet_table executed successfully")
-
         # insert enrich tmp_btc_address_cluster stored procedure in GP
         apply_sql_query(open(local_file_path + "cluster_address_enrich_procedures.sql", "r").read())
         call_procedure("enrich_tmp_btc_address_cluster_table")
         print("Procedure enrich_tmp_btc_address_cluster_table executed successfully")
+
+        # insert enrich tmp_btc_wallet stored procedure in GP
+        apply_sql_query(open(local_file_path + "cluster_wallet_enrich_procedures.sql", "r").read())
+        call_procedure("enrich_tmp_btc_wallet_table")
+        print("Procedure enrich_tmp_btc_wallet_table executed successfully")
 
         # insert enrich tmp_btc_wallet_transaction stored procedure in GP
         apply_sql_query(open(local_file_path + "cluster_tx_enrich_procedures.sql", "r").read())

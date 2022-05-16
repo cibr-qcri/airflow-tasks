@@ -70,13 +70,14 @@ begin
     UPDATE
       tmp_btc_wallet
     SET
-      total_spent=total_spent + total_spent_table.total_spent
+      total_spent=total_spent + total_spent_table.total_spent,
+      total_spent_usd=total_spent_usd + total_spent_table.total_spent_usd
     FROM
       (
         select * from (
-            select SUM(total_value) as total_spent, cluster_id from (
-            select all_inputs.address, total_value, cluster_id from (
-            select address, SUM(tx_value) as total_value from btc_tx_input where id >= start_num and id < end_num group by address) AS all_inputs 
+            select SUM(total_value) as total_spent, SUM(total_usd_value) as total_spent_usd, cluster_id from (
+            select all_inputs.address, total_value, total_usd_value, cluster_id from (
+            select address, SUM(tx_value) as total_value, SUM(usd_value) as total_usd_value from btc_tx_input where id >= start_num and id < end_num group by address) AS all_inputs 
             INNER JOIN (select address, cluster_id from tmp_btc_address_cluster) as cluster 
             ON cluster.address = all_inputs.address) as total_spent 
             group by cluster_id) as final
@@ -90,40 +91,40 @@ begin
 end ;
 $$ language plpgsql;
 
-create or replace function enrich_wallet_total_spent_usd()
-returns void
-as $$
-DECLARE start_num int :=1;
-DECLARE chunk_size int :=10000000;
-DECLARE num_rows int;
-DECLARE end_num int;
-begin
-    num_rows := (select MAX(id) FROM btc_tx_input);
-    WHILE start_num <= num_rows LOOP
-    end_num := (start_num + chunk_size);
-    -- query starts
-    UPDATE
-      tmp_btc_wallet
-    SET
-      total_spent_usd=total_spent_usd + total_spent_usd_table.total_spent_usd
-    FROM
-      (
-        select * from (
-            select SUM(total_usd_value) as total_spent_usd, cluster_id from (
-            select all_inputs.address, total_usd_value, cluster_id from (
-            select address, SUM(usd_value) as total_usd_value from btc_tx_input where id >= start_num and id < end_num group by address) AS all_inputs 
-            INNER JOIN (select address, cluster_id from tmp_btc_address_cluster) as cluster 
-            ON cluster.address = all_inputs.address) as total_spent_usd 
-            group by cluster_id) as final
-      ) AS total_spent_usd_table
-    WHERE
-      tmp_btc_wallet.cluster_id=total_spent_usd_table.cluster_id;
-    -- query ends
-    raise notice 'update wallet total spent USD: processed input range % - %',start_num, end_num;
-    start_num := (start_num + chunk_size);
-    END LOOP;
-end ;
-$$ language plpgsql;
+-- create or replace function enrich_wallet_total_spent_usd()
+-- returns void
+-- as $$
+-- DECLARE start_num int :=1;
+-- DECLARE chunk_size int :=10000000;
+-- DECLARE num_rows int;
+-- DECLARE end_num int;
+-- begin
+--     num_rows := (select MAX(id) FROM btc_tx_input);
+--     WHILE start_num <= num_rows LOOP
+--     end_num := (start_num + chunk_size);
+--     -- query starts
+--     UPDATE
+--       tmp_btc_wallet
+--     SET
+--       total_spent_usd=total_spent_usd + total_spent_usd_table.total_spent_usd
+--     FROM
+--       (
+--         select * from (
+--             select SUM(total_usd_value) as total_spent_usd, cluster_id from (
+--             select all_inputs.address, total_usd_value, cluster_id from (
+--             select address, SUM(usd_value) as total_usd_value from btc_tx_input where id >= start_num and id < end_num group by address) AS all_inputs 
+--             INNER JOIN (select address, cluster_id from tmp_btc_address_cluster) as cluster 
+--             ON cluster.address = all_inputs.address) as total_spent_usd 
+--             group by cluster_id) as final
+--       ) AS total_spent_usd_table
+--     WHERE
+--       tmp_btc_wallet.cluster_id=total_spent_usd_table.cluster_id;
+--     -- query ends
+--     raise notice 'update wallet total spent USD: processed input range % - %',start_num, end_num;
+--     start_num := (start_num + chunk_size);
+--     END LOOP;
+-- end ;
+-- $$ language plpgsql;
 
 create or replace function enrich_wallet_total_received()
 returns void
@@ -140,13 +141,14 @@ begin
     UPDATE
       tmp_btc_wallet
     SET
-      total_received=total_received + total_received_table.total_received
+      total_received=total_received + total_received_table.total_received,
+      total_received_usd=total_received_usd + total_received_table.total_received_usd
     FROM
       (
         select * from (
-          select SUM(total_value) as total_received, cluster_id from (
-          select all_outputs.address, total_value, cluster_id from (
-          select address, SUM(tx_value) as total_value from btc_tx_output where id >= start_num and id < end_num group by address) AS all_outputs 
+          select SUM(total_value) as total_received, SUM(total_usd_value) as total_received_usd, cluster_id from (
+          select all_outputs.address, total_value, total_usd_value, cluster_id from (
+          select address, SUM(tx_value) as total_value, SUM(usd_value) as total_usd_value from btc_tx_output where id >= start_num and id < end_num group by address) AS all_outputs 
           INNER JOIN (select address, cluster_id from tmp_btc_address_cluster) as cluster 
           ON cluster.address = all_outputs.address) as total_received 
         group by cluster_id) as final
@@ -160,40 +162,40 @@ begin
 end ;
 $$ language plpgsql;
 
-create or replace function enrich_wallet_total_received_usd()
-returns void
-as $$
-DECLARE start_num int :=1;
-DECLARE chunk_size int :=10000000;
-DECLARE num_rows int;
-DECLARE end_num int;
-begin 
-    num_rows := (select MAX(id) FROM btc_tx_output);
-    WHILE start_num <= num_rows LOOP
-    end_num := (start_num + chunk_size);
-    -- query starts
-    UPDATE
-      tmp_btc_wallet
-    SET
-      total_received_usd=total_received_usd + total_received_usd_table.total_received_usd
-    FROM
-      (
-        select * from (
-          select SUM(total_usd_value) as total_received_usd, cluster_id from (
-          select all_outputs.address, total_usd_value, cluster_id from (
-          select address, SUM(usd_value) as total_usd_value from btc_tx_output where id >= start_num and id < end_num group by address) AS all_outputs 
-          INNER JOIN (select address, cluster_id from tmp_btc_address_cluster) as cluster 
-          ON cluster.address = all_outputs.address) as total_received 
-        group by cluster_id) as final
-      ) AS total_received_usd_table
-    WHERE
-      tmp_btc_wallet.cluster_id=total_received_usd_table.cluster_id;
-    -- query ends
-    raise notice 'update wallet total received USD: processed output range % - %',start_num, end_num;
-    start_num := (start_num + chunk_size);
-    END LOOP;
-end ;
-$$ language plpgsql;
+-- create or replace function enrich_wallet_total_received_usd()
+-- returns void
+-- as $$
+-- DECLARE start_num int :=1;
+-- DECLARE chunk_size int :=10000000;
+-- DECLARE num_rows int;
+-- DECLARE end_num int;
+-- begin 
+--     num_rows := (select MAX(id) FROM btc_tx_output);
+--     WHILE start_num <= num_rows LOOP
+--     end_num := (start_num + chunk_size);
+--     -- query starts
+--     UPDATE
+--       tmp_btc_wallet
+--     SET
+--       total_received_usd=total_received_usd + total_received_usd_table.total_received_usd
+--     FROM
+--       (
+--         select * from (
+--           select SUM(total_usd_value) as total_received_usd, cluster_id from (
+--           select all_outputs.address, total_usd_value, cluster_id from (
+--           select address, SUM(usd_value) as total_usd_value from btc_tx_output where id >= start_num and id < end_num group by address) AS all_outputs 
+--           INNER JOIN (select address, cluster_id from tmp_btc_address_cluster) as cluster 
+--           ON cluster.address = all_outputs.address) as total_received 
+--         group by cluster_id) as final
+--       ) AS total_received_usd_table
+--     WHERE
+--       tmp_btc_wallet.cluster_id=total_received_usd_table.cluster_id;
+--     -- query ends
+--     raise notice 'update wallet total received USD: processed output range % - %',start_num, end_num;
+--     start_num := (start_num + chunk_size);
+--     END LOOP;
+-- end ;
+-- $$ language plpgsql;
 
 create or replace function enrich_wallet_total_tx()
 returns void
@@ -226,7 +228,7 @@ begin
     UPDATE
       tmp_btc_wallet
     SET
-      labels=label_wallets.json
+      label=label_wallets.json
     FROM
       (
       SELECT cluster_id, CAST(json_object_agg(element, count) AS TEXT) as json from (
@@ -249,17 +251,17 @@ begin
     UPDATE
       tmp_btc_wallet
     SET
-      categories=category_wallets.json
+      category=category_wallets.json
     FROM
       (
       SELECT cluster_id, CAST(json_object_agg(element, count) AS TEXT) as json from (
-		  with elements (cluster_id, element) as (
-		  select cluster_id, unnest(string_to_array(categories, ',')) from (
-		  select btc_address_cluster.cluster_id, array_to_string(array_agg(btc_address_label.category), ',') as categories from 
-		  btc_address_cluster join btc_address_label ON btc_address_cluster.address=btc_address_label.address 
-		  group by btc_address_cluster.cluster_id
-		  ) as categories group by cluster_id, categories) select cluster_id, element, count(*) as count 
-		  from elements group by cluster_id, element order by count desc) as data group by cluster_id
+      with elements (cluster_id, element) as (
+      select cluster_id, unnest(string_to_array(categories, ',')) from (
+      select tmp_btc_address_cluster.cluster_id, array_to_string(array_agg(btc_address_label.category), ',') as categories from 
+      tmp_btc_address_cluster join btc_address_label ON tmp_btc_address_cluster.address=btc_address_label.address 
+      group by tmp_btc_address_cluster.cluster_id
+      ) as categories group by cluster_id, categories) select cluster_id, element, count(*) as count 
+      from elements group by cluster_id, element order by count desc) as data group by cluster_id
       ) AS category_wallets
     WHERE
       tmp_btc_wallet.cluster_id=category_wallets.cluster_id;
