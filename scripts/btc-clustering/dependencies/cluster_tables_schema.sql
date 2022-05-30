@@ -19,7 +19,9 @@ CREATE TABLE tmp_btc_wallet(
 	total_received_usd numeric DEFAULT 0,
 	risk_score float DEFAULT -1,
 	label text,
-	category text
+	category text,
+	btc_balance bigint,
+	usd_balance numeric
 );
 
 CREATE TABLE tmp_btc_wallet_transaction(

@@ -16,7 +16,7 @@ if [[ $STORED_BLOCK_HEIGHT =~ $re ]] ; then
 fi
 echo "Staring block height is $((START_BLOCK_HEIGHT))"
 
-psql -h "$GREENPLUM_HOST" -p "$GREENPLUM_PORT" --user=$GREENPLUM_USERNAME -f btc_blockchain_schema.sql
+psql -h "$GREENPLUM_HOST" -p "$GREENPLUM_PORT" --user=$GREENPLUM_USERNAME -f /btc_blockchain_schema.sql
 
 export start_block_height=${START_BLOCK_HEIGHT}
 export end_block_height=${END_BLOCK_HEIGHT}

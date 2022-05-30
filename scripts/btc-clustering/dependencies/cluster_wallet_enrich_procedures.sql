@@ -21,6 +21,8 @@ begin
     raise notice 'Wallet tabel is updated with labels!';
     PERFORM enrich_wallet_categories();
     raise notice 'Wallet tabel is updated with categories!';
+    PERFORM enrich_wallet_balance();
+    raise notice 'Wallet tabel is updated with balances!';
 end ;
 $$ language plpgsql;
 
@@ -267,3 +269,25 @@ begin
       tmp_btc_wallet.cluster_id=category_wallets.cluster_id;
 end ;
 $$ language plpgsql;
+
+create or replace function enrich_wallet_balance()
+returns void
+as $$
+begin 
+    UPDATE
+      tmp_btc_wallet
+    SET
+      btc_balance=temp_wallet.btc_balance,
+      usd_balance=temp_wallet.usd_balance
+    FROM
+      (
+      SELECT 
+      cluster_id, 
+      total_received - total_spent as btc_balance, 
+      total_received_usd - total_spent_usd as usd_balance 
+      FROM tmp_btc_wallet) AS temp_wallet
+    WHERE
+      tmp_btc_wallet.cluster_id=temp_wallet.cluster_id;
+end ;
+$$ language plpgsql;
+
