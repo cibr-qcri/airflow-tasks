@@ -8,7 +8,7 @@ from airflow.kubernetes.volume_mount import VolumeMount
 YESTERDAY = datetime.datetime.now() - datetime.timedelta(days=1)
 
 volume_mount = VolumeMount(
-    'toshi-airflow-pvc',
+    'cibr-airflow-pvc',
     mount_path='/opt/airflow/dags/',
     sub_path=None,
     read_only=False
@@ -16,10 +16,10 @@ volume_mount = VolumeMount(
 
 volume_config = {
     'persistentVolumeClaim':{
-        'claimName': 'toshi-airflow-pvc'
+        'claimName': 'cibr-airflow-pvc'
     }
 }
-volume = Volume(name='toshi-airflow-pvc', configs=volume_config)
+volume = Volume(name='cibr-airflow-pvc', configs=volume_config)
 
 def failure_end_job():
     print("BTC address labeling job failed")
@@ -42,7 +42,6 @@ with models.DAG(
         name="btc_address_labeling_job",
         image='toshiqcri/btc-address-labels:latest',
         image_pull_policy='Always',
-        namespace='airflow-cluster',
         task_id="btc_address_labeling_job",
         volumes=[volume],
         volume_mounts=[volume_mount],

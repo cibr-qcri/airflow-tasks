@@ -44,7 +44,6 @@ with models.DAG(
         name="arangodb_backup_dag",
         image='toshiqcri/backup-arangodb:latest',
         image_pull_policy='Always',
-        namespace='airflow-cluster',
         task_id="arangodb_backup_dag",
         do_xcom_push=False,
         volumes=[volume],

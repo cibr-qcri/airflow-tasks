@@ -1,0 +1,42 @@
+FROM ubuntu:20.04
+
+LABEL maintainer.0="CIBR-QCRI Team"
+
+ARG ETHEREUM_CLIENT_HOST=10.4.8.131
+ARG ETHEREUM_CLIENT_PORT=30872
+ARG START_BLOCK_HEIGHT
+ARG END_BLOCK_HEIGHT
+ARG BATCH_SIZE=10000
+ARG GREENPLUM_HOST=10.4.8.131
+ARG GREENPLUM_SERVICE_PORT=5432
+ARG GREENPLUM_USERNAME=gpadmin
+ARG GREENPLUM_DB=eth_blockchain
+
+RUN useradd -r bitcoin \
+  && apt-get update -y \
+  && apt-get install -y curl gnupg gosu python3-pip jq postgresql-client\
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* 
+
+ENV ETHEREUM_CLIENT_HOST=$ETHEREUM_CLIENT_HOST
+ENV ETHEREUM_CLIENT_PORT=$ETHEREUM_CLIENT_PORT
+ENV START_BLOCK_HEIGHT=$START_BLOCK_HEIGHT
+ENV END_BLOCK_HEIGHT=$END_BLOCK_HEIGHT
+ENV BATCH_SIZE=$BATCH_SIZE
+ENV GREENPLUM_HOST=$GREENPLUM_HOST
+ENV GREENPLUM_SERVICE_PORT=$GREENPLUM_PORT
+ENV GREENPLUM_USERNAME=$GREENPLUM_USERNAME
+ENV GREENPLUM_PASSWORD=$GREENPLUM_PASSWORD
+ENV GREENPLUM_DB=$GREENPLUM_DB
+
+RUN mkdir /eth-blockchain-parser
+WORKDIR "/eth-blockchain-parser"
+COPY bootstrap.sh ./bootstrap.sh
+COPY dependencies/eth_blockchain_schema.sql ./eth_blockchain_schema.sql
+
+RUN pip3 install ethereum-etl
+RUN chmod 755 ./bootstrap.sh ./eth_blockchain_schema.sql
+
+EXPOSE 5432 8529 30872
+
+ENTRYPOINT ["./bootstrap.sh"]

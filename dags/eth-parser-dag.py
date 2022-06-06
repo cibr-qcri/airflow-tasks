@@ -18,15 +18,15 @@ default_dag_args = {
 }
 
 with models.DAG(
-        dag_id='btc-parser-dag',
+        dag_id='eth-parser-dag',
         schedule_interval='@weekly',
         default_args=default_dag_args) as dag:
 
     task_parser = KubernetesPodOperator(
-        name="btc_parsing_task",
-        image='toshiqcri/btc-etl-parser:latest',
+        name="eth_parsing_task",
+        image='toshiqcri/eth-etl-parser:latest',
         image_pull_policy='Always',
-        task_id="btc_parsing_task",
+        task_id="eth_parsing_task",
         do_xcom_push=False,
         is_delete_operator_pod=False
     )

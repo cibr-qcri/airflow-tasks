@@ -8,7 +8,7 @@ from airflow.kubernetes.volume_mount import VolumeMount
 YESTERDAY = datetime.datetime.now() - datetime.timedelta(days=1)
 
 volume_mount = VolumeMount(
-    'toshi-airflow-pvc',
+    'cibr-airflow-pvc',
     mount_path='/opt/airflow/dags/',
     sub_path=None,
     read_only=False
@@ -16,10 +16,10 @@ volume_mount = VolumeMount(
 
 volume_config = {
     'persistentVolumeClaim':{
-        'claimName': 'toshi-airflow-pvc'
+        'claimName': 'cibr-airflow-pvc'
     }
 }
-volume = Volume(name='toshi-airflow-pvc', configs=volume_config)
+volume = Volume(name='cibr-airflow-pvc', configs=volume_config)
 
 affinity = {
     "nodeAffinity": {
@@ -71,7 +71,6 @@ with models.DAG(
         name="btc_clustering_job",
         image='toshiqcri/clustering-task-01:latest',
         image_pull_policy='Always',
-        namespace='airflow-cluster',
         task_id="btc_clustering_job",
         do_xcom_push=False,
         volumes=[volume],
@@ -84,7 +83,6 @@ with models.DAG(
         name="btc_cluster_mapping_job",
         image='toshiqcri/clustering-task-02:latest',
         image_pull_policy='Always',
-        namespace='airflow-cluster',
         task_id="btc_cluster_mapping_job",
         do_xcom_push=False,
         volumes=[volume],
@@ -97,7 +95,6 @@ with models.DAG(
         name="btc_enrich_tables_job",
         image='toshiqcri/clustering-task-03:latest',
         image_pull_policy='Always',
-        namespace='airflow-cluster',
         task_id="btc_enrich_tables_job",
         do_xcom_push=False,
         volumes=[volume],
@@ -110,7 +107,6 @@ with models.DAG(
         name="btc_link_wallet_tables_job",
         image='toshiqcri/clustering-task-04:latest',
         image_pull_policy='Always',
-        namespace='airflow-cluster',
         task_id="btc_link_wallet_tables_job",
         do_xcom_push=False,
         volumes=[volume],
