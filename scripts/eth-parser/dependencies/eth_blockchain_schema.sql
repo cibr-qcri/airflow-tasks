@@ -1,4 +1,5 @@
 CREATE DATABASE eth_blockchain;
+
 \c eth_blockchain;
 
 CREATE TABLE eth_block (
