@@ -7,7 +7,7 @@ export LANG=C.UTF-8
 echo "Ethereum Parser Staring ...."
 
 # apply database if not exists
-if [[ "$( psql -h "$GREENPLUM_HOST" -p "$GREENPLUM_SERVICE_PORT" --user=$GREENPLUM_USERNAME -c "SELECT 1 FROM pg_database WHERE datname='$GREENPLUM_DB'" )" != '1' ]] ; then
+if [[ "$( psql -h "$GREENPLUM_HOST" -p "$GREENPLUM_SERVICE_PORT" --user=$GREENPLUM_USERNAME -c "SELECT 1 FROM pg_database WHERE datname='$GREENPLUM_DB'" | sed -n '3p' | xargs )" != '1' ]] ; then
   psql -h "$GREENPLUM_HOST" -p "$GREENPLUM_SERVICE_PORT" --user=$GREENPLUM_USERNAME -f /eth_blockchain_schema.sql
 fi
 
@@ -98,7 +98,7 @@ export_data() {
 }
 
 purge_csv() {
-  rm blocks.csv transactions.csv token_transfers.csv receipts.csv logs.csv token_transfers.csv tokens.csv
+  rm blocks.csv transactions.csv token_transfers.csv receipts.csv logs.csv contracts.csv tokens.csv
 }
 
 echo "Staring block height is $((START_BLOCK_HEIGHT))"

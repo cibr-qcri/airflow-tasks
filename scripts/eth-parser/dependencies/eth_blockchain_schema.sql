@@ -97,7 +97,8 @@ CREATE TABLE eth_token (
     symbol text,
     name text,
     decimals bigint,
-    total_supply numeric
+    total_supply numeric,
+    block_number bigint
 );
 
 CREATE TABLE eth_trace (
