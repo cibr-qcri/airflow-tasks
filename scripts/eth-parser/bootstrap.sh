@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PROVIDER_URI="http://"${ETHEREUM_CLIENT_HOST}":"${ETHEREUM_CLIENT_PORT}
+export PROVIDER_URI="http://"${ETHEREUM_CLIENT_HOST}":"${ETHEREUM_CLIENT_PORT}
 export LC_ALL=C.UTF-8
 export LANG=C.UTF-8
 
@@ -12,7 +12,7 @@ if [[ "$( psql -h "$GREENPLUM_HOST" -p "$GREENPLUM_SERVICE_PORT" --user=$GREENPL
 fi
 
 # find last inserted block height for the given range
-LAST_BLOCK_HEIGHT=$(psql -h "$GREENPLUM_HOST" -p "$GREENPLUM_SERVICE_PORT" -d "$GREENPLUM_DB" --user=$GREENPLUM_USERNAME -c "SELECT max(height) FROM eth_block WHERE height >= $START_BLOCK and height <= $END_BLOCK;" | sed -n '3p' | xargs)
+LAST_BLOCK_HEIGHT=$(psql -h "$GREENPLUM_HOST" -p "$GREENPLUM_SERVICE_PORT" -d "$GREENPLUM_DB" --user=$GREENPLUM_USERNAME -c "SELECT max(number) FROM eth_block WHERE number >= $START_BLOCK_HEIGHT and number <= $END_BLOCK_HEIGHT;" | sed -n '3p' | xargs)
 re='^[0-9]+$'
 if [[ $LAST_BLOCK_HEIGHT =~ $re ]] ; then
    START_BLOC_HEIGHTK=$LAST_BLOCK_HEIGHT
