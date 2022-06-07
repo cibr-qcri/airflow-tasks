@@ -6,7 +6,7 @@ from airflow.providers.cncf.kubernetes.operators.kubernetes_pod import Kubernete
 YESTERDAY = datetime.datetime.now() - datetime.timedelta(days=1)
 
 def failure_end_job():
-    print("BTC parsing job failed")
+    print("ETH parsing job failed")
 
 default_dag_args = {
     'start_date': YESTERDAY,
