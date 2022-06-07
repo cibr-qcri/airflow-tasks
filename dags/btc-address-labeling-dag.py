@@ -39,7 +39,7 @@ with models.DAG(
         start_date=YESTERDAY) as dag:
 
     task_address_labeling = KubernetesPodOperator(
-        namespace='airflow',
+        namespace='default',
         name="btc_address_labeling_job",
         image='toshiqcri/btc-address-labels:latest',
         image_pull_policy='Always',
