@@ -35,7 +35,7 @@ default_dag_args = {
 
 with models.DAG(
         dag_id='eth-parser-dag',
-        schedule_interval='@weekly',
+        schedule_interval=None,
         start_date=YESTERDAY) as dag:
 
     task_parser = KubernetesPodOperator(
