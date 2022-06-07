@@ -40,4 +40,4 @@ RUN chmod 755 ./bootstrap.sh ./eth_blockchain_schema.sql
 
 EXPOSE 5432 8529 30872
 
-ENTRYPOINT ["./bootstrap.sh"]
+ENTRYPOINT ["bootstrap.sh"]
