@@ -36,8 +36,9 @@ COPY bootstrap.sh ./bootstrap.sh
 COPY dependencies/eth_blockchain_schema.sql ./eth_blockchain_schema.sql
 
 RUN pip3 install ethereum-etl
-RUN chmod 755 ./bootstrap.sh ./eth_blockchain_schema.sql
+RUN chmod 755 ./bootstrap.sh 
+RUN chmod 755 ./eth_blockchain_schema.sql
 
 EXPOSE 5432 8529 30872
 
-ENTRYPOINT ["bootstrap.sh"]
+CMD [ "stdbuf", "-oL", "sh", "bootstrap.sh" ]
