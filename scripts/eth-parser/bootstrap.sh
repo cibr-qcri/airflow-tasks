@@ -8,7 +8,7 @@ echo "Ethereum Parser Staring ...."
 
 # apply database if not exists
 if [[ "$( psql -h "$GREENPLUM_HOST" -p "$GREENPLUM_SERVICE_PORT" --user=$GREENPLUM_USERNAME -c "SELECT 1 FROM pg_database WHERE datname='$GREENPLUM_DB'" )" != '1' ]] ; then
-  psql -h "$GREENPLUM_HOST" -p "$GREENPLUM_SERVICE_PORT" --user=$GREENPLUM_USERNAME -f ./eth_blockchain_schema.sql
+  psql -h "$GREENPLUM_HOST" -p "$GREENPLUM_SERVICE_PORT" --user=$GREENPLUM_USERNAME -f /eth_blockchain_schema.sql
 fi
 
 # find last inserted block height for the given range
