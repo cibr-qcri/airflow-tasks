@@ -107,7 +107,7 @@ export end_block_height=${END_BLOCK_HEIGHT}
 export parse_chunk=${BATCH_SIZE}
 
 while sleep 1; do
-    block_count=$(printf "%d\n" $(curl --silent -H "Content-Type: application/json"  -X POST --data '{"jsonrpc":"2.0","method":"eth_syncing","params":[],"id":1}' "$((PROVIDER_URI))" | jq '.result.currentBlock' | tr -d '"' ))
+    block_count=$(printf "%d\n" $(curl --silent -H "Content-Type: application/json"  -X POST --data '{"jsonrpc":"2.0","method":"eth_syncing","params":[],"id":1}' $PROVIDER_URI | jq '.result.currentBlock' | tr -d '"' ))
     echo "Current block height - $((block_count))"
 
     if ((block_count > start_block_height+parse_chunk+5)) && ((end_block_height >= start_block_height+parse_chunk)); then
