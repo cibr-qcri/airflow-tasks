@@ -1,0 +1,4 @@
+elasticsearch
+psycopg2==2.8.6
+SQLAlchemy~=1.4.9
+git+https://github.com/messari/messari-python-api.git
