@@ -31,6 +31,7 @@ CREATE TABLE eth_transaction (
     nonce bigint,
     block_hash varchar(256),
     block_number bigint,
+    index bigint,
     transaction_index bigint,
     from_address varchar(256),
     to_address varchar(256),
