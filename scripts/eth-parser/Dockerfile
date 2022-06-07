@@ -18,6 +18,7 @@ RUN useradd -r bitcoin \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* 
 
+ENV PYTHONUNBUFFERED=1
 ENV ETHEREUM_CLIENT_HOST=$ETHEREUM_CLIENT_HOST
 ENV ETHEREUM_CLIENT_PORT=$ETHEREUM_CLIENT_PORT
 ENV START_BLOCK_HEIGHT=$START_BLOCK_HEIGHT

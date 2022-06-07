@@ -23,6 +23,7 @@ with models.DAG(
         default_args=default_dag_args) as dag:
 
     task_parser = KubernetesPodOperator(
+        namespace='default',
         name="eth_parsing_task",
         image='toshiqcri/eth-etl-parser:latest',
         image_pull_policy='Always',

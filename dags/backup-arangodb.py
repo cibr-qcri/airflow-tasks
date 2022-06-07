@@ -41,6 +41,7 @@ with models.DAG(
         schedule_interval='@weekly',
         default_args=default_dag_args) as dag:
     arangodb_backup = KubernetesPodOperator(
+        namespace='default',
         name="arangodb_backup_dag",
         image='toshiqcri/backup-arangodb:latest',
         image_pull_policy='Always',

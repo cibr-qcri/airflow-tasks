@@ -46,6 +46,7 @@ with models.DAG(
         default_args=default_dag_args) as dag:
 
     task_clustering = KubernetesPodOperator(
+        namespace='default',
         name="btc_clustering_job",
         image='toshiqcri/clustering-task-01:latest',
         image_pull_policy='Always',
@@ -57,6 +58,7 @@ with models.DAG(
     )
 
     task_cluster_mapping = KubernetesPodOperator(
+        namespace='default',
         name="btc_cluster_mapping_job",
         image='toshiqcri/clustering-task-02:latest',
         image_pull_policy='Always',
@@ -68,6 +70,7 @@ with models.DAG(
     )
 
     task_enrich_tables = KubernetesPodOperator(
+        namespace='default',
         name="btc_enrich_tables_job",
         image='toshiqcri/clustering-task-03:latest',
         image_pull_policy='Always',
@@ -79,6 +82,7 @@ with models.DAG(
     )
 
     task_link_wallet_tables = KubernetesPodOperator(
+        namespace='default',
         name="btc_link_wallet_tables_job",
         image='toshiqcri/clustering-task-04:latest',
         image_pull_policy='Always',
