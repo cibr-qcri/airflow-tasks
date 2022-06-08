@@ -1,3 +1,4 @@
+
 CREATE TABLE IF NOT EXISTS defilama_protocol (
     id varchar primary key NOT NULL,
 	symbol varchar,
