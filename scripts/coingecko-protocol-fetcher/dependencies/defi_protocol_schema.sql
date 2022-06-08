@@ -1,15 +1,16 @@
-CREATE TABLE IF NOT EXISTS protocol (
+CREATE TABLE IF NOT EXISTS coingecko_protocol (
     gecko_id VARCHAR PRIMARY KEY NOT NULL,
     symbol VARCHAR,
     name VARCHAR,
     asset_platform_id VARCHAR,
-    genesis_date DATE,
+    genesis_date DATE NULL,
     platform JSONB,
     category JSONB,
     description TEXT,
     contract_address VARCHAR
 );
 
+/*
 CREATE TABLE IF NOT EXISTS protocol_market_data (
     protocol VARCHAR PRIMARY KEY NOT NULL,
     current_price FLOAT,
@@ -62,3 +63,4 @@ CREATE TABLE IF NOT EXISTS protocol_ticker_data (
     is_anomaly VARCHAR,
     is_stale VARCHAR
 );
+*/
