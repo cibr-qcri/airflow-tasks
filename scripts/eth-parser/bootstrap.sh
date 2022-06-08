@@ -83,7 +83,7 @@ export_data() {
   sed -i '1d' tokens.csv
 
   psql -h "$GREENPLUM_HOST" -p "$GREENPLUM_SERVICE_PORT" -d "$GREENPLUM_DB" --user=$GREENPLUM_USERNAME -c "\\COPY eth_block(number,hash,parent_hash,nonce,sha3_uncles,logs_bloom,transactions_root,state_root,receipts_root,miner,difficulty,total_difficulty,size,extra_data,gas_limit,gas_used,timestamp,transaction_count,base_fee_per_gas) FROM blocks.csv CSV DELIMITER E','"
-  psql -h "$GREENPLUM_HOST" -p "$GREENPLUM_SERVICE_PORT" -d "$GREENPLUM_DB" --user=$GREENPLUM_USERNAME -c "\\COPY eth_transaction(hash, block_number, index, fee, input_value, output_value, is_coinbase, input_count, output_count, input_usd_value, output_usd_value, timestamp) FROM transactions.csv CSV DELIMITER E','"
+  psql -h "$GREENPLUM_HOST" -p "$GREENPLUM_SERVICE_PORT" -d "$GREENPLUM_DB" --user=$GREENPLUM_USERNAME -c "\\COPY eth_transaction(hash,nonce,block_hash,block_number,transaction_index,from_address,to_address,value,gas,gas_price,input,block_timestamp,max_fee_per_gas,max_priority_fee_per_gas,transaction_type) FROM transactions.csv CSV DELIMITER E','"
   echo "Blocks and Txes data successfully uploaded to the GreenplumpDB for block range $((start_block_height))-$((end_block_height))"
   psql -h "$GREENPLUM_HOST" -p "$GREENPLUM_SERVICE_PORT" -d "$GREENPLUM_DB" --user=$GREENPLUM_USERNAME -c "\\COPY eth_token_transfer(token_address,from_address,to_address,value,transaction_hash,log_index,block_number) FROM token_transfers.csv CSV DELIMITER E','"
   echo "Token transfer data successfully uploaded to the GreenplumpDB for block range $((start_block_height))-$((end_block_height))"
