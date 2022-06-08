@@ -23,7 +23,8 @@ with models.DAG(
         dag_id='defilama-fetcher-dag',
         schedule_interval='@weekly',
         default_args=default_dag_args) as dag:
-    task_fetcher = KubernetesPodOperator(
+
+    defilama_fetcher = KubernetesPodOperator(
         namespace='default',
         name='defilama_fetcher_task',
         image='toshiqcri/defilama-protocol-fetcher:latest',
@@ -33,4 +34,14 @@ with models.DAG(
         is_delete_operator_pod=True
     )
 
-task_fetcher
+    coingecko_fetcher = KubernetesPodOperator(
+        namespace='default',
+        name='defilama_fetcher_task',
+        image='toshiqcri/coingecko-protocol-fetcher:latest',
+        image_pull_policy='Always',
+        task_id='coingecko_fetcher_task',
+        do_xcom_push=False,
+        is_delete_operator_pod=True
+    )
+
+defilama_fetcher >> coingecko_fetcher
