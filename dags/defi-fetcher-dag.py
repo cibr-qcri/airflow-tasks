@@ -7,7 +7,7 @@ YESTERDAY = datetime.datetime.now() - datetime.timedelta(days=1)
 
 
 def failure_end_job():
-    print("Defilama fetcher failed")
+    print("Defi fetcher failed")
 
 
 default_dag_args = {
@@ -20,7 +20,7 @@ default_dag_args = {
 }
 
 with models.DAG(
-        dag_id='defilama-fetcher-dag',
+        dag_id='defi-fetcher-dag',
         schedule_interval='@weekly',
         default_args=default_dag_args) as dag:
 
