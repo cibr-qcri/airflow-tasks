@@ -13,7 +13,7 @@ purge_data() {
 
 # apply database if not exists
 if [[ "$( psql -h "$GREENPLUM_HOST" -p "$GREENPLUM_SERVICE_PORT" --user=gpadmin -c "SELECT 1 FROM pg_database WHERE datname='$GREENPLUM_DB'" | sed -n '3p' | xargs )" != '1' ]] ; then
-  psql -h "$GREENPLUM_SERVICE_HOST" -p "$GREENPLUM_SERVICE_PORT" --user=gpadmin -f /btc_blockchain_schema.sql
+  psql -h "$GREENPLUM_SERVICE_HOST" -p "$GREENPLUM_SERVICE_PORT" --user=gpadmin -f btc_blockchain_schema.sql
 fi
 
 file=data/last_processed_number-$START_BLOCK_HEIGHT-$END_BLOCK_HEIGHT.txt
@@ -38,7 +38,7 @@ export_and_store_blocks() {
   bitcoinetl enrich_transactions --provider-uri $PROVIDER_URI --batch-size 100 --transactions-input transactions.json \
         --transactions-output enriched_transactions.json  && \
   echo "Blocks exported from bitcoin-etl range $((start_block_height))-$((end_block_height))"
-  python3 /process_blockchain.py && \
+  python3 process_blockchain.py && \
   psql -h "$GREENPLUM_SERVICE_HOST" -p "$GREENPLUM_SERVICE_PORT" -d btc_blockchain --user=gpadmin -c "\\COPY btc_block(height, hash, block_time, tx_count) FROM blocks_sql.csv CSV DELIMITER E','"
   psql -h "$GREENPLUM_SERVICE_HOST" -p "$GREENPLUM_SERVICE_PORT" -d btc_blockchain --user=gpadmin -c "\\COPY btc_transaction(hash, block_number, index, fee, input_value, output_value, is_coinbase, input_count, output_count, input_usd_value, output_usd_value, timestamp) FROM tx_sql.csv CSV DELIMITER E','"
   psql -h "$GREENPLUM_SERVICE_HOST" -p "$GREENPLUM_SERVICE_PORT" -d btc_blockchain --user=gpadmin -c "\\COPY btc_tx_input(tx_hash, address, address_type, tx_value, usd_value, block_number, timestamp) FROM in_addr_sql.csv CSV DELIMITER E','"
