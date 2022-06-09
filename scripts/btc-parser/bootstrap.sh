@@ -18,7 +18,7 @@ fi
 
 file=data/last_processed_number-$START_BLOCK_HEIGHT-$END_BLOCK_HEIGHT.txt
 if [ -f "$file" ]; then
-    START_BLOCK_HEIGHT=$(< last_processed_number-$START_BLOCK_HEIGHT-$END_BLOCK_HEIGHT.txt)
+    START_BLOCK_HEIGHT=$(< data/last_processed_number-$START_BLOCK_HEIGHT-$END_BLOCK_HEIGHT.txt)
 else 
     echo "File last_processed_number-$START_BLOCK_HEIGHT-$END_BLOCK_HEIGHT.txt does not exist"
 fi 
