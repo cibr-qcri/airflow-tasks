@@ -100,94 +100,94 @@ with models.DAG(
         env_vars = env_vars_1
     )
 
-    task_parser_2 = KubernetesPodOperator(
-        namespace='default',
-        name="btc_parsing_task_100000-200000",
-        image='toshiqcri/btc-etl-parser:latest',
-        image_pull_policy='Always',
-        task_id="btc_parsing_task_100000-200000",
-        do_xcom_push=False,
-        is_delete_operator_pod=False,
-        env_vars = env_vars_2
-    )
+    # task_parser_2 = KubernetesPodOperator(
+    #     namespace='default',
+    #     name="btc_parsing_task_100000-200000",
+    #     image='toshiqcri/btc-etl-parser:latest',
+    #     image_pull_policy='Always',
+    #     task_id="btc_parsing_task_100000-200000",
+    #     do_xcom_push=False,
+    #     is_delete_operator_pod=False,
+    #     env_vars = env_vars_2
+    # )
 
-    task_parser_3 = KubernetesPodOperator(
-        namespace='default',
-        name="btc_parsing_task_200000-300000",
-        image='toshiqcri/btc-etl-parser:latest',
-        image_pull_policy='Always',
-        task_id="btc_parsing_task_200000-300000",
-        do_xcom_push=False,
-        is_delete_operator_pod=False,
-        volumes=[volume],
-        volume_mounts=[volume_mount],
-        env_vars = env_vars_3
-    )
+    # task_parser_3 = KubernetesPodOperator(
+    #     namespace='default',
+    #     name="btc_parsing_task_200000-300000",
+    #     image='toshiqcri/btc-etl-parser:latest',
+    #     image_pull_policy='Always',
+    #     task_id="btc_parsing_task_200000-300000",
+    #     do_xcom_push=False,
+    #     is_delete_operator_pod=False,
+    #     volumes=[volume],
+    #     volume_mounts=[volume_mount],
+    #     env_vars = env_vars_3
+    # )
 
-    task_parser_4 = KubernetesPodOperator(
-        namespace='default',
-        name="btc_parsing_task_300000-400000",
-        image='toshiqcri/btc-etl-parser:latest',
-        image_pull_policy='Always',
-        task_id="btc_parsing_task_300000-400000",
-        do_xcom_push=False,
-        is_delete_operator_pod=False,
-        volumes=[volume],
-        volume_mounts=[volume_mount],
-        env_vars = env_vars_4
-    )
+    # task_parser_4 = KubernetesPodOperator(
+    #     namespace='default',
+    #     name="btc_parsing_task_300000-400000",
+    #     image='toshiqcri/btc-etl-parser:latest',
+    #     image_pull_policy='Always',
+    #     task_id="btc_parsing_task_300000-400000",
+    #     do_xcom_push=False,
+    #     is_delete_operator_pod=False,
+    #     volumes=[volume],
+    #     volume_mounts=[volume_mount],
+    #     env_vars = env_vars_4
+    # )
 
-    task_parser_5 = KubernetesPodOperator(
-        namespace='default',
-        name="btc_parsing_task_400000-500000",
-        image='toshiqcri/btc-etl-parser:latest',
-        image_pull_policy='Always',
-        task_id="btc_parsing_task_400000-500000",
-        do_xcom_push=False,
-        is_delete_operator_pod=False,
-        volumes=[volume],
-        volume_mounts=[volume_mount],
-        env_vars = env_vars_5
-    )
+    # task_parser_5 = KubernetesPodOperator(
+    #     namespace='default',
+    #     name="btc_parsing_task_400000-500000",
+    #     image='toshiqcri/btc-etl-parser:latest',
+    #     image_pull_policy='Always',
+    #     task_id="btc_parsing_task_400000-500000",
+    #     do_xcom_push=False,
+    #     is_delete_operator_pod=False,
+    #     volumes=[volume],
+    #     volume_mounts=[volume_mount],
+    #     env_vars = env_vars_5
+    # )
 
-    task_parser_6 = KubernetesPodOperator(
-        namespace='default',
-        name="btc_parsing_task_500000-600000",
-        image='toshiqcri/btc-etl-parser:latest',
-        image_pull_policy='Always',
-        task_id="btc_parsing_task_500000-600000",
-        do_xcom_push=False,
-        is_delete_operator_pod=False,
-        volumes=[volume],
-        volume_mounts=[volume_mount],
-        env_vars = env_vars_6
-    )
+    # task_parser_6 = KubernetesPodOperator(
+    #     namespace='default',
+    #     name="btc_parsing_task_500000-600000",
+    #     image='toshiqcri/btc-etl-parser:latest',
+    #     image_pull_policy='Always',
+    #     task_id="btc_parsing_task_500000-600000",
+    #     do_xcom_push=False,
+    #     is_delete_operator_pod=False,
+    #     volumes=[volume],
+    #     volume_mounts=[volume_mount],
+    #     env_vars = env_vars_6
+    # )
 
-    task_parser_7 = KubernetesPodOperator(
-        namespace='default',
-        name="btc_parsing_task_600000-700000",
-        image='toshiqcri/btc-etl-parser:latest',
-        image_pull_policy='Always',
-        task_id="btc_parsing_task_600000-700000",
-        do_xcom_push=False,
-        is_delete_operator_pod=False,
-        volumes=[volume],
-        volume_mounts=[volume_mount],
-        env_vars = env_vars_7
-    )
+    # task_parser_7 = KubernetesPodOperator(
+    #     namespace='default',
+    #     name="btc_parsing_task_600000-700000",
+    #     image='toshiqcri/btc-etl-parser:latest',
+    #     image_pull_policy='Always',
+    #     task_id="btc_parsing_task_600000-700000",
+    #     do_xcom_push=False,
+    #     is_delete_operator_pod=False,
+    #     volumes=[volume],
+    #     volume_mounts=[volume_mount],
+    #     env_vars = env_vars_7
+    # )
 
-    task_parser_8 = KubernetesPodOperator(
-        namespace='default',
-        name="btc_parsing_task_700000-800000",
-        image='toshiqcri/btc-etl-parser:latest',
-        image_pull_policy='Always',
-        task_id="btc_parsing_task_700000-800000",
-        do_xcom_push=False,
-        is_delete_operator_pod=False,
-        volumes=[volume],
-        volume_mounts=[volume_mount],
-        env_vars = env_vars_8
-    )
+    # task_parser_8 = KubernetesPodOperator(
+    #     namespace='default',
+    #     name="btc_parsing_task_700000-800000",
+    #     image='toshiqcri/btc-etl-parser:latest',
+    #     image_pull_policy='Always',
+    #     task_id="btc_parsing_task_700000-800000",
+    #     do_xcom_push=False,
+    #     is_delete_operator_pod=False,
+    #     volumes=[volume],
+    #     volume_mounts=[volume_mount],
+    #     env_vars = env_vars_8
+    # )
 
 [task_parser_1]
 
