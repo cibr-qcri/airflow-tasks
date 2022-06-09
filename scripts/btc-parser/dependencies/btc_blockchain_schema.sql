@@ -1,6 +1,6 @@
-CREATE DATABASE IF NOT EXISTS btc_blockchain;
+CREATE DATABASE IF NOT EXISTS btc_blockchain_new;
 
-\c btc_blockchain;
+\c btc_blockchain_new;
 
 CREATE TABLE IF NOT EXISTS btc_transaction (
 	id SERIAL primary key NOT NULL,

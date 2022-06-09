@@ -4,19 +4,26 @@ PROVIDER_URI="http://"${BITCOIN_DAEMON_USERNAME}":"${BITCOIN_DAEMON_PASSWORD}"@"
 export LC_ALL=C.UTF-8
 export LANG=C.UTF-8
 
+echo "Staring BTC Parser ...."
+
 purge_data() {
   rm transactions.json blocks.json enriched_transactions.json
   rm blocks_sql.csv tx_sql.csv in_addr_sql.csv out_addr_sql.csv
 }
 
-STORED_BLOCK_HEIGHT=$(psql -h "$GREENPLUM_HOST" -p "$GREENPLUM_PORT" -d "$GREENPLUM_DB" --user=$GREENPLUM_USERNAME -c "SELECT height FROM btc_block ORDER BY id DESC LIMIT 1;" | sed -n '3p' | xargs)
-re='^[0-9]+$'
-if [[ $STORED_BLOCK_HEIGHT =~ $re ]] ; then
-   START_BLOCK_HEIGHT=$STORED_BLOCK_HEIGHT
+# apply database if not exists
+if [[ "$( psql -h "$GREENPLUM_HOST" -p "$GREENPLUM_SERVICE_PORT" --user=gpadmin -c "SELECT 1 FROM pg_database WHERE datname='$GREENPLUM_DB'" | sed -n '3p' | xargs )" != '1' ]] ; then
+  psql -h "$GREENPLUM_SERVICE_HOST" -p "$GREENPLUM_SERVICE_PORT" --user=gpadmin -f /btc_blockchain_schema.sql
 fi
-echo "Staring block height is $((START_BLOCK_HEIGHT))"
 
-psql -h "$GREENPLUM_HOST" -p "$GREENPLUM_PORT" --user=$GREENPLUM_USERNAME -f /btc_blockchain_schema.sql
+file=/last_processed_number-$START_BLOCK_HEIGHT-$END_BLOCK_HEIGHT.txt
+if [ -e "$file" ]; then
+    START_BLOCK_HEIGHT=$(< /last_processed_number-$START_BLOCK_HEIGHT-$END_BLOCK_HEIGHT.txt)
+else 
+    echo "File last_processed_number.txt does not exist"
+fi 
+
+echo "Staring block height is $((START_BLOCK_HEIGHT))"
 
 export start_block_height=${START_BLOCK_HEIGHT}
 export end_block_height=${END_BLOCK_HEIGHT}
@@ -27,17 +34,19 @@ export_and_store_blocks() {
   local end_block_height=$2
 
   bitcoinetl export_blocks_and_transactions --start-block "$((start_block_height))" --end-block "$((end_block_height))" \
-        --provider-uri $PROVIDER_URI --batch-size 10 --max-workers 10 --chain bitcoin --blocks-output blocks.json --transactions-output transactions.json && \
-  bitcoinetl enrich_transactions --provider-uri $PROVIDER_URI --batch-size 10 --max-workers 10 --transactions-input transactions.json \
+        --provider-uri $PROVIDER_URI --batch-size 100 --chain bitcoin --blocks-output blocks.json --transactions-output transactions.json && \
+  bitcoinetl enrich_transactions --provider-uri $PROVIDER_URI --batch-size 100 --transactions-input transactions.json \
         --transactions-output enriched_transactions.json  && \
   echo "Blocks exported from bitcoin-etl range $((start_block_height))-$((end_block_height))"
-  python3 process_blockchain.py && \
-  psql -h "$GREENPLUM_HOST" -p "$GREENPLUM_PORT" -d "$GREENPLUM_PORT" --user=$GREENPLUM_USERNAME -c "\\COPY btc_block(height, hash, block_time, tx_count) FROM blocks_sql.csv CSV DELIMITER E','"
-  psql -h "$GREENPLUM_HOST" -p "$GREENPLUM_PORT" -d "$GREENPLUM_PORT" --user=$GREENPLUM_USERNAME -c "\\COPY btc_transaction(hash, block_number, index, fee, input_value, output_value, is_coinbase, input_count, output_count, input_usd_value, output_usd_value, timestamp) FROM tx_sql.csv CSV DELIMITER E','"
-  psql -h "$GREENPLUM_HOST" -p "$GREENPLUM_PORT" -d "$GREENPLUM_PORT" --user=$GREENPLUM_USERNAME -c "\\COPY btc_tx_input(tx_hash, address, address_type, tx_value, usd_value) FROM in_addr_sql.csv CSV DELIMITER E','"
-  psql -h "$GREENPLUM_HOST" -p "$GREENPLUM_PORT" -d "$GREENPLUM_PORT" --user=$GREENPLUM_USERNAME -c "\\COPY btc_tx_output(tx_hash, address, address_type, tx_value, usd_value) FROM out_addr_sql.csv CSV DELIMITER E','"
+  python3 /process_blockchain.py && \
+  psql -h "$GREENPLUM_SERVICE_HOST" -p "$GREENPLUM_SERVICE_PORT" -d btc_blockchain --user=gpadmin -c "\\COPY btc_block(height, hash, block_time, tx_count) FROM blocks_sql.csv CSV DELIMITER E','"
+  psql -h "$GREENPLUM_SERVICE_HOST" -p "$GREENPLUM_SERVICE_PORT" -d btc_blockchain --user=gpadmin -c "\\COPY btc_transaction(hash, block_number, index, fee, input_value, output_value, is_coinbase, input_count, output_count, input_usd_value, output_usd_value, timestamp) FROM tx_sql.csv CSV DELIMITER E','"
+  psql -h "$GREENPLUM_SERVICE_HOST" -p "$GREENPLUM_SERVICE_PORT" -d btc_blockchain --user=gpadmin -c "\\COPY btc_tx_input(tx_hash, address, address_type, tx_value, usd_value, block_number, timestamp) FROM in_addr_sql.csv CSV DELIMITER E','"
+  psql -h "$GREENPLUM_SERVICE_HOST" -p "$GREENPLUM_SERVICE_PORT" -d btc_blockchain --user=gpadmin -c "\\COPY btc_tx_output(tx_hash, address, address_type, tx_value, usd_value, block_number, timestamp) FROM out_addr_sql.csv CSV DELIMITER E','"
   echo "Data successfully uploaded to GreenplumpDB from block range $((start_block_height))-$((end_block_height))"
   purge_data
+
+  echo "$((end_block_height))" > /last_processed_number-$START_BLOCK_HEIGHT-$END_BLOCK_HEIGHT.txt
 }
 
 while sleep 1; do
@@ -56,4 +65,4 @@ while sleep 1; do
     fi
 done
 
-echo "Ending toshi-bitcoin parser..."
+echo "Ending BTC Parser..."
