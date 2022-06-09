@@ -9,7 +9,7 @@ YESTERDAY = datetime.datetime.now() - datetime.timedelta(days=1)
 
 volume_mount = VolumeMount(
     'cibr-airflow-pvc',
-    mount_path='/opt/airflow/dags/',
+    mount_path='/blockchain-parser/data/',
     sub_path=None,
     read_only=False
 )
