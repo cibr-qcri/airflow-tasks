@@ -1,8 +1,16 @@
-CREATE DATABASE IF NOT EXISTS btc_blockchain_new;
+CREATE DATABASE btc_blockchain_new;
 
 \c btc_blockchain_new;
 
-CREATE TABLE IF NOT EXISTS btc_transaction (
+CREATE TABLE btc_block (
+	id SERIAL primary key NOT NULL,
+	height integer,
+	hash varchar(65),
+	block_time varchar(16),
+	tx_count integer
+);
+
+CREATE TABLE btc_transaction (
 	id SERIAL primary key NOT NULL,
 	fee bigint,
 	block_number integer,
@@ -18,15 +26,7 @@ CREATE TABLE IF NOT EXISTS btc_transaction (
 	timestamp bigint
 );
 
-CREATE TABLE IF NOT EXISTS btc_block (
-	id SERIAL primary key NOT NULL,
-	height integer,
-	hash varchar(65),
-	block_time varchar(16),
-	tx_count integer
-);
-
-CREATE TABLE IF NOT EXISTS btc_tx_input (
+CREATE TABLE btc_tx_input (
 	id SERIAL primary key NOT NULL,
 	tx_hash varchar(65),
 	index integer,
@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS btc_tx_input (
 	timestamp bigint
 );
 
-CREATE TABLE IF NOT EXISTS btc_tx_output (
+CREATE TABLE btc_tx_output (
 	id SERIAL primary key NOT NULL,
 	tx_hash varchar(65),
 	index integer,

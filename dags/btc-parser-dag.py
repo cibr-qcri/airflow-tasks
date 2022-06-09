@@ -35,49 +35,49 @@ default_dag_args = {
 }
 
 env_vars_1 = {
-    'END_BLOCK_HEIGHT' : '0',
+    'START_BLOCK_HEIGHT' : '0',
     'END_BLOCK_HEIGHT' : '100000',
     'BATCH_SIZE': '10000'
 }
 
 env_vars_2 = {
-    'END_BLOCK_HEIGHT' : '100000',
+    'START_BLOCK_HEIGHT' : '100000',
     'END_BLOCK_HEIGHT' : '200000',
     'BATCH_SIZE': '10000'
 }
 
 env_vars_3 = {
-    'END_BLOCK_HEIGHT' : '200000',
+    'START_BLOCK_HEIGHT' : '200000',
     'END_BLOCK_HEIGHT' : '300000',
     'BATCH_SIZE': '10000'
 }
 
 env_vars_4 = {
-    'END_BLOCK_HEIGHT' : '300000',
+    'START_BLOCK_HEIGHT' : '300000',
     'END_BLOCK_HEIGHT' : '400000',
     'BATCH_SIZE': '10000'
 }
 
 env_vars_5 = {
-    'END_BLOCK_HEIGHT' : '400000',
+    'START_BLOCK_HEIGHT' : '400000',
     'END_BLOCK_HEIGHT' : '500000',
     'BATCH_SIZE': '10000'
 }
 
 env_vars_6 = {
-    'END_BLOCK_HEIGHT' : '500000',
+    'START_BLOCK_HEIGHT' : '500000',
     'END_BLOCK_HEIGHT' : '600000',
     'BATCH_SIZE': '10000'
 }
 
 env_vars_7 = {
-    'END_BLOCK_HEIGHT' : '600000',
+    'START_BLOCK_HEIGHT' : '600000',
     'END_BLOCK_HEIGHT' : '700000',
     'BATCH_SIZE': '10000'
 }
 
 env_vars_8 = {
-    'END_BLOCK_HEIGHT' : '700000',
+    'START_BLOCK_HEIGHT' : '700000',
     'END_BLOCK_HEIGHT' : '800000',
     'BATCH_SIZE': '10000'
 }
