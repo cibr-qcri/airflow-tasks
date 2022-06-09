@@ -15,9 +15,8 @@ volume_mount = VolumeMount(
 )
 
 volume_config = {
-    'name': 'cibr-airflow-pvc',
-    'hostPath': {
-        'path': '/cibr-dev-data/backups/arangodb'
+    'persistentVolumeClaim':{
+        'claimName': 'cibr-airflow-pvc'
     }
 }
 volume = Volume(name='cibr-airflow-pvc', configs=volume_config)
