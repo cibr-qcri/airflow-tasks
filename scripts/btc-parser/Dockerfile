@@ -42,8 +42,7 @@ RUN set -ex \
   && tar -xzf *.tar.gz -C /opt \
   && rm *.tar.gz
 
-RUN mkdir /blockchain-parser
-WORKDIR "/blockchain-parser"
+WORKDIR /usr/src/job
 COPY bootstrap.sh /bootstrap.sh
 COPY blockchain-parser.py /blockchain-parser.py
 COPY dependencies/btc_blockchain_schema.sql /btc_blockchain_schema.sql
