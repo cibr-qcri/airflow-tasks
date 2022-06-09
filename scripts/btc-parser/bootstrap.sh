@@ -17,7 +17,7 @@ if [[ "$( psql -h "$GREENPLUM_HOST" -p "$GREENPLUM_SERVICE_PORT" --user=gpadmin 
 fi
 
 file=data/last_processed_number-$START_BLOCK_HEIGHT-$END_BLOCK_HEIGHT.txt
-if [ -e "$file" ]; then
+if [ -f "$file" ]; then
     START_BLOCK_HEIGHT=$(< last_processed_number-$START_BLOCK_HEIGHT-$END_BLOCK_HEIGHT.txt)
 else 
     echo "File last_processed_number-$START_BLOCK_HEIGHT-$END_BLOCK_HEIGHT.txt does not exist"

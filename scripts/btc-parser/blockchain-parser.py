@@ -248,10 +248,10 @@ def write_sql_to_files():
         writer = csv.writer(file)
         writer.writerows(out_address_buffer)
     
-    del block_buffer[:]
-    del transaction_buffer[:]
-    del in_address_buffer[:]
-    del out_address_buffer[:]
+    block_buffer.clear()
+    transaction_buffer.clear()
+    in_address_buffer.clear()
+    out_address_buffer.clear()
     gc.collect()
 
 
@@ -303,7 +303,7 @@ def write_graph_to_files():
     logging.info("[ArangoDB] start adding blocks - ", len(block_graph_buffer))
     try:
         chunks = split_list_as_chunks(block_graph_buffer)
-        del block_graph_buffer[:]
+        block_graph_buffer.clear()
         for chunk in chunks:
             blocks.insert_many(chunk)
         chunks.clear()    
@@ -313,7 +313,7 @@ def write_graph_to_files():
     logging.info("[ArangoDB] start adding tx - ", len(tx_buffer))
     try:
         chunks = split_list_as_chunks(tx_buffer)
-        del tx_buffer[:]
+        tx_buffer.clear()
         for chunk in chunks:
             transactions.insert_many(chunk)
         chunks.clear()    
@@ -323,7 +323,7 @@ def write_graph_to_files():
     logging.info("[ArangoDB] start adding addresses - ", len(address_buffer))
     try:
         chunks = split_list_as_chunks(address_buffer)
-        del address_buffer[:]
+        address_buffer.clear()
         for chunk in chunks:
             addresses.insert_many(chunk)
         chunks.clear()    
@@ -333,7 +333,7 @@ def write_graph_to_files():
     logging.info("[ArangoDB] start adding edges - ", len(edge_buffer))
     try:
         chunks = split_list_as_chunks(edge_buffer)
-        del edge_buffer[:]
+        edge_buffer.clear()
         for chunk in chunks:
             edges.insert_many(chunk)
         chunks.clear()
@@ -373,7 +373,7 @@ def save_exchange_data():
     with open('usd_exchange_rates.pickle', 'wb') as f:
         pickle.dump(usd_exchange_rates, f, pickle.HIGHEST_PROTOCOL)
     
-    del usd_exchange_rates[:]
+    usd_exchange_rates.clear()
 
     if COINDESK_END_DATE != last_process_date:
         last_processed_exchange_dates = dict()
