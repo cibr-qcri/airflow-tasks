@@ -45,16 +45,17 @@ RUN set -ex \
 RUN mkdir /blockchain-parser
 RUN mkdir /blockchain-parser/data
 WORKDIR "/blockchain-parser"
-COPY bootstrap.sh bootstrap.sh
-COPY blockchain-parser.py blockchain-parser.py
-COPY dependencies/btc_blockchain_schema.sql btc_blockchain_schema.sql
+
+COPY bootstrap.sh ./bootstrap.sh
+COPY blockchain-parser.py ./blockchain-parser.py
+COPY dependencies/btc_blockchain_schema.sql ./btc_blockchain_schema.sql
 
 RUN pip3 install bitcoin-etl python-arango
 
-RUN chmod 755 bootstrap.sh
-RUN chmod 755 blockchain-parser.py
-RUN chmod 755 btc_blockchain_schema.sql
+RUN chmod 755 ./bootstrap.sh
+RUN chmod 755 ./blockchain-parser.py
+RUN chmod 755 ./btc_blockchain_schema.sql
 
 EXPOSE 8332 8333 18332 18333 18443 18444 5432 8529
 
-ENTRYPOINT ["bootstrap.sh"]
+ENTRYPOINT ["./bootstrap.sh"]
