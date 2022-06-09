@@ -16,11 +16,11 @@ if [[ "$( psql -h "$GREENPLUM_HOST" -p "$GREENPLUM_SERVICE_PORT" --user=gpadmin 
   psql -h "$GREENPLUM_SERVICE_HOST" -p "$GREENPLUM_SERVICE_PORT" --user=gpadmin -f /btc_blockchain_schema.sql
 fi
 
-file=/last_processed_number-$START_BLOCK_HEIGHT-$END_BLOCK_HEIGHT.txt
+file=last_processed_number-$START_BLOCK_HEIGHT-$END_BLOCK_HEIGHT.txt
 if [ -e "$file" ]; then
-    START_BLOCK_HEIGHT=$(< /last_processed_number-$START_BLOCK_HEIGHT-$END_BLOCK_HEIGHT.txt)
+    START_BLOCK_HEIGHT=$(< last_processed_number-$START_BLOCK_HEIGHT-$END_BLOCK_HEIGHT.txt)
 else 
-    echo "File last_processed_number.txt does not exist"
+    echo "File last_processed_number-$START_BLOCK_HEIGHT-$END_BLOCK_HEIGHT.txt does not exist"
 fi 
 
 echo "Staring block height is $((START_BLOCK_HEIGHT))"
@@ -46,7 +46,7 @@ export_and_store_blocks() {
   echo "Data successfully uploaded to GreenplumpDB from block range $((start_block_height))-$((end_block_height))"
   purge_data
 
-  echo "$((end_block_height))" > /last_processed_number-$START_BLOCK_HEIGHT-$END_BLOCK_HEIGHT.txt
+  echo "$((end_block_height))" > last_processed_number-$START_BLOCK_HEIGHT-$END_BLOCK_HEIGHT.txt
 }
 
 while sleep 1; do
