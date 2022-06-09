@@ -1,6 +1,6 @@
-CREATE DATABASE btc_blockchain_new;
+CREATE DATABASE btc_blockchain;
 
-\c btc_blockchain_new;
+\c btc_blockchain;
 
 CREATE TABLE btc_block (
 	id SERIAL primary key NOT NULL,
