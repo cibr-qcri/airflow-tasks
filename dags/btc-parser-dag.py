@@ -189,5 +189,5 @@ with models.DAG(
         env_vars = env_vars_8
     )
 
-[task_parser_1, task_parser_2, task_parser_3, task_parser_4, task_parser_5, task_parser_6, task_parser_7, task_parser_8]
+[task_parser_1]
 
