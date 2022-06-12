@@ -41,7 +41,7 @@ with models.DAG(
         image_pull_policy='Always',
         task_id='coingecko_fetcher_task',
         do_xcom_push=False,
-        is_delete_operator_pod=True
+        is_delete_operator_pod=False
     )
 
 defilama_fetcher >> coingecko_fetcher
