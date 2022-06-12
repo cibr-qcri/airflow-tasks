@@ -36,7 +36,7 @@ with models.DAG(
 
     coingecko_fetcher = KubernetesPodOperator(
         namespace='default',
-        name='defilama_fetcher_task',
+        name='coingecko_fetcher_task',
         image='toshiqcri/coingecko-protocol-fetcher:latest',
         image_pull_policy='Always',
         task_id='coingecko_fetcher_task',
