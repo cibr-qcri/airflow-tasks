@@ -19,7 +19,7 @@ def connects_to_greenplum():
                                          port=os.getenv('GREENPLUM_SERVICE_PORT'),
                                          database=os.getenv('GREENPLUM_DEFI_DB'))
         gp_cursor = gp_connection.cursor()
-        gp_cursor.execute((open('dependencies/defi_protocol_schema.sql', 'r').read()))
+        gp_cursor.execute((open('defi_protocol_schema.sql', 'r').read()))
         gp_connection.commit()
     except (Exception, Error) as error:
         sys.exit("Error while connecting to PostgreSQL", error)
