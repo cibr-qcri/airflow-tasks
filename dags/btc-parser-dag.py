@@ -35,50 +35,58 @@ default_dag_args = {
 
 env_vars_1 = {
     'START_BLOCK_HEIGHT' : '0',
-    'END_BLOCK_HEIGHT' : '100000',
-    'BATCH_SIZE': '10000'
+    'END_BLOCK_HEIGHT' : '200000',
+    'BATCH_SIZE': '10000',
+    'BITCOIN_DAEMON_HOST': '10.4.8.146',
+    'BITCOIN_DAEMON_PORT': '30239'
 }
 
 env_vars_2 = {
-    'START_BLOCK_HEIGHT' : '100000',
-    'END_BLOCK_HEIGHT' : '200000',
-    'BATCH_SIZE': '10000'
+    'START_BLOCK_HEIGHT' : '200000',
+    'END_BLOCK_HEIGHT' : '300000',
+    'BATCH_SIZE': '10000',
+    'BITCOIN_DAEMON_HOST': '10.4.8.146',
+    'BITCOIN_DAEMON_PORT': '30234'
 }
 
 env_vars_3 = {
-    'START_BLOCK_HEIGHT' : '200000',
-    'END_BLOCK_HEIGHT' : '300000',
-    'BATCH_SIZE': '10000'
+    'START_BLOCK_HEIGHT' : '300000',
+    'END_BLOCK_HEIGHT' : '400000',
+    'BATCH_SIZE': '10000',
+    'BITCOIN_DAEMON_HOST': '10.4.8.146',
+    'BITCOIN_DAEMON_PORT': '30235'
 }
 
 env_vars_4 = {
-    'START_BLOCK_HEIGHT' : '300000',
-    'END_BLOCK_HEIGHT' : '400000',
-    'BATCH_SIZE': '10000'
+    'START_BLOCK_HEIGHT' : '400000',
+    'END_BLOCK_HEIGHT' : '500000',
+    'BATCH_SIZE': '10000',
+    'BITCOIN_DAEMON_HOST': '10.4.8.146',
+    'BITCOIN_DAEMON_PORT': '30236'
 }
 
 env_vars_5 = {
-    'START_BLOCK_HEIGHT' : '400000',
-    'END_BLOCK_HEIGHT' : '500000',
-    'BATCH_SIZE': '10000'
+    'START_BLOCK_HEIGHT' : '500000',
+    'END_BLOCK_HEIGHT' : '600000',
+    'BATCH_SIZE': '10000',
+    'BITCOIN_DAEMON_HOST': '10.4.8.146',
+    'BITCOIN_DAEMON_PORT': '30237'
 }
 
 env_vars_6 = {
-    'START_BLOCK_HEIGHT' : '500000',
-    'END_BLOCK_HEIGHT' : '600000',
-    'BATCH_SIZE': '10000'
+    'START_BLOCK_HEIGHT' : '600000',
+    'END_BLOCK_HEIGHT' : '700000',
+    'BATCH_SIZE': '10000',
+    'BITCOIN_DAEMON_HOST': '10.4.8.146',
+    'BITCOIN_DAEMON_PORT': '30238'
 }
 
 env_vars_7 = {
-    'START_BLOCK_HEIGHT' : '600000',
-    'END_BLOCK_HEIGHT' : '700000',
-    'BATCH_SIZE': '10000'
-}
-
-env_vars_8 = {
     'START_BLOCK_HEIGHT' : '700000',
     'END_BLOCK_HEIGHT' : '800000',
-    'BATCH_SIZE': '10000'
+    'BATCH_SIZE': '10000',
+    'BITCOIN_DAEMON_HOST': '10.4.8.146',
+    'BITCOIN_DAEMON_PORT': '30233'
 }
 
 with models.DAG(
@@ -88,10 +96,10 @@ with models.DAG(
 
     task_parser_1 = KubernetesPodOperator(
         namespace='default',
-        name="btc_parsing_task_1-100000",
+        name="btc_parsing_task_1-200000",
         image='toshiqcri/btc-etl-parser:latest',
         image_pull_policy='Always',
-        task_id="btc_parsing_task_1-100000",
+        task_id="btc_parsing_task_1-200000",
         do_xcom_push=False,
         is_delete_operator_pod=False,
         volumes=[volume],
@@ -101,17 +109,6 @@ with models.DAG(
 
     task_parser_2 = KubernetesPodOperator(
         namespace='default',
-        name="btc_parsing_task_100000-200000",
-        image='toshiqcri/btc-etl-parser:latest',
-        image_pull_policy='Always',
-        task_id="btc_parsing_task_100000-200000",
-        do_xcom_push=False,
-        is_delete_operator_pod=False,
-        env_vars = env_vars_2
-    )
-
-    task_parser_3 = KubernetesPodOperator(
-        namespace='default',
         name="btc_parsing_task_200000-300000",
         image='toshiqcri/btc-etl-parser:latest',
         image_pull_policy='Always',
@@ -120,10 +117,10 @@ with models.DAG(
         is_delete_operator_pod=False,
         volumes=[volume],
         volume_mounts=[volume_mount],
-        env_vars = env_vars_3
+        env_vars = env_vars_2
     )
 
-    task_parser_4 = KubernetesPodOperator(
+    task_parser_3 = KubernetesPodOperator(
         namespace='default',
         name="btc_parsing_task_300000-400000",
         image='toshiqcri/btc-etl-parser:latest',
@@ -133,10 +130,10 @@ with models.DAG(
         is_delete_operator_pod=False,
         volumes=[volume],
         volume_mounts=[volume_mount],
-        env_vars = env_vars_4
+        env_vars = env_vars_3
     )
 
-    task_parser_5 = KubernetesPodOperator(
+    task_parser_4 = KubernetesPodOperator(
         namespace='default',
         name="btc_parsing_task_400000-500000",
         image='toshiqcri/btc-etl-parser:latest',
@@ -146,10 +143,10 @@ with models.DAG(
         is_delete_operator_pod=False,
         volumes=[volume],
         volume_mounts=[volume_mount],
-        env_vars = env_vars_5
+        env_vars = env_vars_4
     )
 
-    task_parser_6 = KubernetesPodOperator(
+    task_parser_5 = KubernetesPodOperator(
         namespace='default',
         name="btc_parsing_task_500000-600000",
         image='toshiqcri/btc-etl-parser:latest',
@@ -159,10 +156,10 @@ with models.DAG(
         is_delete_operator_pod=False,
         volumes=[volume],
         volume_mounts=[volume_mount],
-        env_vars = env_vars_6
+        env_vars = env_vars_5
     )
 
-    task_parser_7 = KubernetesPodOperator(
+    task_parser_6 = KubernetesPodOperator(
         namespace='default',
         name="btc_parsing_task_600000-700000",
         image='toshiqcri/btc-etl-parser:latest',
@@ -172,10 +169,10 @@ with models.DAG(
         is_delete_operator_pod=False,
         volumes=[volume],
         volume_mounts=[volume_mount],
-        env_vars = env_vars_7
+        env_vars = env_vars_6
     )
 
-    task_parser_8 = KubernetesPodOperator(
+    task_parser_7 = KubernetesPodOperator(
         namespace='default',
         name="btc_parsing_task_700000-800000",
         image='toshiqcri/btc-etl-parser:latest',
@@ -183,9 +180,7 @@ with models.DAG(
         task_id="btc_parsing_task_700000-800000",
         do_xcom_push=False,
         is_delete_operator_pod=False,
-        volumes=[volume],
-        volume_mounts=[volume_mount],
-        env_vars = env_vars_8
+        env_vars = env_vars_7
     )
 
-[task_parser_1, task_parser_2, task_parser_3, task_parser_4, task_parser_5, task_parser_6, task_parser_7, task_parser_8]
+[task_parser_1, task_parser_2, task_parser_3, task_parser_4, task_parser_5, task_parser_6, task_parser_7]
