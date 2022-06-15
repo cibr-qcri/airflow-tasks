@@ -24,6 +24,7 @@ ENV BITCOIN_DAEMON_HOST=bitcoin-daemon-service
 ENV BITCOIN_DAEMON_USERNAME=user
 ENV BITCOIN_DAEMON_PASSWORD=password
 ENV BITCOIN_DAEMON_PORT=8332
+ENV PATH=/opt/bitcoin-${BITCOIN_VERSION}/bin:$PATH
 ENV PYTHONUNBUFFERED=1
 ENV GREENPLUM_HOST=10.4.8.146
 ENV GREENPLUM_PORT=$gp_port
@@ -35,6 +36,11 @@ ENV ARANGO_PASSWORD=$arango_password
 ENV ARANGO_HOST=10.4.8.146
 ENV ARANGO_PORT=$arango_port
 ENV ARANGO_DB=$arango_db
+
+RUN set -ex \
+  && curl -SLO https://bitcoin.org/bin/bitcoin-core-${BITCOIN_VERSION}/bitcoin-${BITCOIN_VERSION}-x86_64-linux-gnu.tar.gz \
+  && tar -xzf *.tar.gz -C /opt \
+  && rm *.tar.gz
 
 RUN mkdir /blockchain-parser
 RUN mkdir /blockchain-parser/data
