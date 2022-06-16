@@ -1,28 +1,45 @@
+import json
+import os
 import sys
+from urllib.request import HTTPBasicAuthHandler
+from arango import ArangoClient
+import requests
+from urllib3.connectionpool import xrange
+import gc
 import psycopg2
 from psycopg2 import Error
-from pathlib import Path
-import csv
-import os
-import networkx as nx
 
+WALLET_COLLECTION = 'btc_wallets/{0}'
+MAX_LIST_LIMIT = 100000
 gp_connection = None
 gp_cursor = None
-volume_mount_path = ''
-local_file_path = 'dependencies/'
+arango_connection = None
 MAX_CURSOR_LIMIT = 500000
-G = nx.MultiDiGraph()
-wallet_size_map = dict()
+
+wallet_buffer = list()
+edge_buffer = list()
+
+GP_HOST=os.getenv('GREENPLUM_HOST')
+GP_USERNAME=os.getenv('GREENPLUM_USERNAME')
+GP_PASSWORD=os.getenv('GREENPLUM_PASSWORD')
+GP_PORT=os.getenv('GREENPLUM_PORT')
+GP_DB=os.getenv('GREENPLUM_DB')
+ARANGO_HOST=os.getenv('ARANGO_HOST')
+ARANGO_PORT=os.getenv('ARANGO_PORT')
+ARANGO_USERNAME=os.getenv('ARANGO_USERNAME')
+ARANGO_PASSWORD=os.getenv('ARANGO_PASSWORD')
+ARANGO_URL='http://'+ARANGO_HOST+':'+ARANGO_PORT
+
 
 def connects_to_greenplum():
     try:
         # Connect to an existing database
         global gp_connection
-        gp_connection = psycopg2.connect(user="gpadmin",
-                                    password="",
-                                    host="10.4.8.131",
-                                    port="5432",
-                                    database="btc_blockchain")
+        gp_connection = psycopg2.connect(user=GP_USERNAME,
+                                    password=GP_PASSWORD,
+                                    host=GP_HOST,
+                                    port=GP_PORT,
+                                    database=GP_DB)
 
         # Create a cursor to perform database operations
         global gp_cursor
@@ -35,6 +52,31 @@ def connects_to_greenplum():
     except (Exception, Error) as error:
         sys.exit("Error while connecting to PostgreSQL", error)
 
+
+def connects_to_arango():
+    try:
+        # Connect to an existing database
+        global arango_connection
+        client = ArangoClient(hosts=ARANGO_URL)
+        arango_connection = client.db(GP_DB, username=ARANGO_USERNAME, password=ARANGO_PASSWORD)
+
+        print("You are connected to - ArangoDB\n")
+        return
+
+    except (Exception, Error) as error:
+        sys.exit("Error while connecting to ArangoDB", error)
+
+
+def execute_sql_query(query):
+    gp_cursor.execute(query)
+    return gp_cursor.fetchall()
+
+
+def execute_sql_batch_query(query):
+    gp_cursor.execute(query)
+    return gp_cursor
+
+
 def close_gp_connection():
     try:
         if (gp_connection):
@@ -42,57 +84,175 @@ def close_gp_connection():
             gp_connection.close()
             print("PostgreSQL connection is closed")
     except (Exception, Error) as error:
-        print("Error while closing the connection to PostgreSQL", error)
+        sys.exit("Error while closing the connection to PostgreSQL", error)
 
-def apply_sql_query(query):
-    gp_cursor.execute(query)
-    gp_connection.commit()
-    print("Record applied successfully ")
 
-def execute_sql_query(query):
-    gp_cursor.execute(query)
-    return gp_cursor.fetchall()
+def close_arango_connection():
+    try:
+        if (arango_connection):
+            arango_connection.close()
+            print("ArangoDB connection is closed")
+    except (Exception, Error) as error:
+        sys.exit("Error while closing the connection to ArangoDB", error)
 
-def call_procedure(procedure_name):
-    gp_cursor.callproc(procedure_name)
-    gp_connection.commit()
-    return gp_cursor.fetchall()
 
-def export_csv(file_name):
-    print("Exporting clustering csv data in : " + file_name)
-    reader = open(file_name, 'r')
-    gp_cursor.copy_from(reader, 'tmp_btc_address_cluster', sep=',', columns=['address', 'cluster_id'])
-    reader.close()
-    gp_connection.commit()
+def create_edge(wallet_in, wallet_out, tx_hash, in_satoshi_amount, out_satoshi_amount, in_usd_amount, out_usd_amount):
+    edge = dict()
+    edge['_from'] = WALLET_COLLECTION.format(wallet_out)
+    edge['_to'] = WALLET_COLLECTION.format(wallet_in)
+    edge['tx_hash'] = tx_hash
+    edge['in_satoshi_amount'] = int(in_satoshi_amount)
+    edge['out_satoshi_amount'] = int(out_satoshi_amount)
+    edge['in_usd_amount'] = float(in_usd_amount)
+    edge['out_usd_amount'] = float(out_usd_amount)
+    edge_buffer.append(edge)
 
-def create_graph(wallet_in, wallet_out, tx_count, out_satoshi_amount, out_usd_amount):
-    G.add_edge(wallet_in,wallet_out, tx_count=tx_count, out_satoshi_amount=out_satoshi_amount, out_usd_amount=out_usd_amount)
 
-def fetch_wallet_edges():
-    total_addresses = execute_sql_query("SELECT max(id) from tmp_btc_address_cluster;")
-    print("Total addresses: ", total_addresses[0][0])
+def write_wallet_vertex():
+    if arango_connection.has_graph('btc_wallet_link_cluster'):
+        arango_connection.graph('btc_wallet_link_cluster')
+    else:
+        arango_connection.create_graph('btc_wallet_link_cluster')
+
+    wc = arango_connection.graph('btc_wallet_link_cluster')
+    if wc.has_vertex_collection("btc_wallets_tmp"):
+        wallets = wc.vertex_collection("btc_wallets_tmp")
+    else:
+        wallets = wc.create_vertex_collection("btc_wallets_tmp")
+
+    print("[ArangoDB] start adding wallets - ", len(wallet_buffer))
+    try:
+        chunks = split_list_as_chunks(wallet_buffer)
+        print("Available chunks to be processed - ", len(chunks))
+        wallet_buffer.clear()
+        count = 0
+        for chunk in chunks:
+            wallets.insert_many(chunk)
+            count = count + len(chunk)
+            print("Processed another 100000 wallets - vertices, total: ", count)
+                
+        chunks.clear()    
+    except:
+        pass
+
+    gc.collect()
+
+
+def write_wallet_edges():
+    if arango_connection.has_graph('btc_wallet_link_cluster'):
+        arango_connection.graph('btc_wallet_link_cluster')
+    else:
+        arango_connection.create_graph('btc_wallet_link_cluster')
+
+    wc = arango_connection.graph('btc_wallet_link_cluster')
+
+    if not wc.has_edge_definition("btc_wallet_links_tmp"):
+        edges = wc.create_edge_definition(
+            edge_collection="btc_wallet_links_tmp",
+            from_vertex_collections=["btc_wallets_tmp", "btc_addresses"],
+            to_vertex_collections=["btc_wallets_tmp", "btc_addresses"])
+    else:
+        edges = wc.edge_collection("btc_wallet_links_tmp")
+
+
+    print("[ArangoDB] start adding wallet edges - ", len(edge_buffer))
+    try:
+        chunks = split_list_as_chunks(edge_buffer)
+        print("Chunk count to be processed - ", len(chunks))
+        edge_buffer.clear()
+        for chunk in chunks:
+            edges.insert_many(chunk)
+        chunks.clear()
+    except:
+        pass
+
+    gc.collect()
+
+
+def split_list_as_chunks(data_list):
+    return [data_list[x:x + MAX_LIST_LIMIT] for x in xrange(0, len(data_list), MAX_LIST_LIMIT)]
+
+
+def wallet_to_graph(wallet_id):
+    vertex = dict()
+    vertex['_key'] = wallet_id
+    wallet_buffer.append(vertex)
+
+
+def arango_post_actions():
+    url = '{}/_db/{}/_api/collection/{}/rename'.format(ARANGO_URL, GP_DB, 'btc_wallets')
+    params = {"name": "btc_wallets_old"}
+    response = requests.put(url, data=json.dumps(params), auth=HTTPBasicAuthHandler(ARANGO_USERNAME, ARANGO_PASSWORD))
+    if response.status_code != 200:
+        sys.exit("Error renaming older collection: btc_wallets")
+
+    url = '{}/_db/{}/_api/collection/{}/rename'.format(ARANGO_URL, GP_DB, 'btc_wallet_links')
+    params = {"name": "btc_wallet_links_old"}
+    response = requests.put(url, data=json.dumps(params), auth=HTTPBasicAuthHandler(ARANGO_USERNAME, ARANGO_PASSWORD))
+    if response.status_code != 200:
+        sys.exit("Error renaming older collection: btc_wallet_link")
+
+    url = '{}/_db/{}/_api/collection/{}/rename'.format(ARANGO_URL, GP_DB, 'btc_wallets_tmp')
+    params = {"name": "btc_wallets"}
+    response = requests.put(url, data=json.dumps(params), auth=HTTPBasicAuthHandler(ARANGO_USERNAME, ARANGO_PASSWORD))
+    if response.status_code != 200:
+        sys.exit("Error renaming older collection: btc_wallets_tmp")
+
+    url = '{}/_db/{}/_api/collection/{}/rename'.format(ARANGO_URL, GP_DB, 'btc_wallet_links_tmp')
+    params = {"name": "btc_wallet_links"}
+    response = requests.put(url, data=json.dumps(params), auth=HTTPBasicAuthHandler(ARANGO_USERNAME, ARANGO_PASSWORD))
+    if response.status_code != 200:
+        sys.exit("Error renaming older collection: btc_wallet_links_tmp")
+
+    url = '{}/_db/{}/_api/collection/{}'.format(ARANGO_URL, GP_DB, 'btc_wallets_old')
+    response = requests.delete(url, auth=HTTPBasicAuthHandler(ARANGO_USERNAME, ARANGO_PASSWORD))
+    if response.status_code != 200:
+        sys.exit("Error deleting older collection: btc_wallets_old")
+
+    url = '{}/_db/{}/_api/collection/{}'.format(ARANGO_URL, GP_DB, 'btc_wallet_links_old')
+    response = requests.delete(url, auth=HTTPBasicAuthHandler(ARANGO_USERNAME, ARANGO_PASSWORD))
+    if response.status_code != 200:
+        sys.exit("Error deleting older collection: btc_wallet_links_old")
+
+
+def main():
+    if not gp_connection or not gp_cursor:
+        connects_to_greenplum()
+
+    if not arango_connection:
+        connects_to_arango()
+    
+    # insert wallet vertices
+    btc_wallet_records = execute_sql_query("SELECT cluster_id from tmp_btc_wallet;")
+    print("Total wallet count - {}".format(len(btc_wallet_records)))
+    for input_row in btc_wallet_records:
+        wallet_id = input_row[0]
+        wallet_to_graph(wallet_id)
+    write_wallet_vertex()
+    
+    total_wallets = execute_sql_query("SELECT max(id) from tmp_btc_wallet;")
+    print("Total wallets: ", total_wallets[0][0])
     start_index = 0
-    end_index = int(total_addresses[0][0])
+    end_index = int(total_wallets[0][0])
     chunk_size = 1000000
-
+    
     while start_index <= end_index:
-        print("Query wallet map for range {} - {}".format(start_index, start_index+chunk_size))
+        # check in input addresses
         cursor = gp_connection.cursor(name='fetch_large_result')
+        print("Query wallet map for input address range {} - {}".format(start_index, start_index+chunk_size))
         cursor.execute("""
-            select wallet_in, wallet_out, in_wallets.tx_hash as tx_hash, out_satoshi_amount, out_usd_amount from (
-              SELECT cluster_id as wallet_out, btc_input_addresses.address as address, tx_hash, tx_value as out_satoshi_amount, usd_value as out_usd_amount 
-              from (select address, cluster_id from tmp_btc_address_cluster where id >= {} and id < {} order by id asc) as btc_input_addresses 
-              INNER JOIN btc_tx_input on btc_input_addresses.address=btc_tx_input.address
-              ) as out_wallets
-            inner join (
-              SELECT cluster_id as wallet_in, btc_output_addresses.address as address, tx_hash, tx_value as in_satoshi_amount, usd_value as in_usd_amount 
-              from (select address, cluster_id from tmp_btc_address_cluster where id >= {} and id < {} order by id asc) as btc_output_addresses 
-              INNER JOIN btc_tx_output on btc_output_addresses.address=btc_tx_output.address 
-            ) as in_wallets 
-            on in_wallets.tx_hash=out_wallets.tx_hash;
-            """.format(start_index, start_index+chunk_size, start_index, start_index+chunk_size))
-            
-        print("Query executed for range - {} - {}".format(start_index, start_index+chunk_size))
+                    select wallet_in, wallet_out, in_wallets.tx_hash as tx_hash, SUM(in_satoshi_amount) as in_satoshi_amount, SUM(out_satoshi_amount) as out_satoshi_amount, SUM(in_usd_amount) as in_usd_amount, SUM(out_usd_amount) as out_usd_amount from (
+                    SELECT btc_tx_input.id as id1, cluster_id as wallet_out, btc_input_addresses.address as address, tx_hash, tx_value as out_satoshi_amount, usd_value as out_usd_amount 
+                    from (select address, tmp_btc_address_cluster.cluster_id from tmp_btc_address_cluster JOIN tmp_btc_wallet ON tmp_btc_wallet.cluster_id=tmp_btc_address_cluster.cluster_id where tmp_btc_wallet.id >= {} and tmp_btc_wallet.id <= {}) as btc_input_addresses 
+                    INNER JOIN btc_tx_input on btc_input_addresses.address=btc_tx_input.address
+                    ) as out_wallets
+                    inner join (
+                    SELECT btc_tx_output.id as id2, cluster_id as wallet_in, btc_output_addresses.address as address, tx_hash, tx_value as in_satoshi_amount, usd_value as in_usd_amount 
+                    from (select address, cluster_id from tmp_btc_address_cluster) as btc_output_addresses 
+                    INNER JOIN btc_tx_output on btc_output_addresses.address=btc_tx_output.address 
+                    ) as in_wallets 
+                    on in_wallets.tx_hash=out_wallets.tx_hash group by wallet_in, wallet_out, in_wallets.tx_hash;
+                    """.format(start_index, start_index+chunk_size))
         fetched_total_count = 0
         while True:
             records = cursor.fetchmany(size=MAX_CURSOR_LIMIT)
@@ -100,143 +260,18 @@ def fetch_wallet_edges():
                 break
             fetched_total_count = fetched_total_count + len(records)
             print("Fetched wallet-wallet edges count - {}".format(fetched_total_count))
-
-            with open(volume_mount_path + 'wallet-edges.csv', 'a', newline='') as source:  
-                wtr = csv.writer(source)
-                for record in records:
-                    wtr.writerow((record[0], record[1], record[2], record[3], record[4]))
-                source.close()
-
+            for address in records:
+                create_edge(address[0], address[1], address[2], address[3], address[4], address[5], address[6])
+            write_wallet_edges()
         cursor.close()
         start_index = start_index + chunk_size
 
-    print("Wallet edges successfully write into a csv file")
-
-def calculate_connected_nodes():
-    print( "Found wallet count from the graph: " + str(len(G.nodes())))
-    processed_nodes = 0
-    for first_cluster in G.nodes():
-        for second_cluster in G.neighbors(first_cluster):
-            current = list()
-            num_txes_to_second = 0
-            num_txes_from_second = 0
-            total_satoshi_to_second = 0
-            total_satoshi_from_second = 0
-            total_usd_to_second = 0
-            total_usd_from_second = 0
-            # find edges from first to second
-            edge_list_to_second = G.get_edge_data(first_cluster, second_cluster)
-            if edge_list_to_second is not None:
-                num_txes_to_second = len(edge_list_to_second)
-                for edge in edge_list_to_second:
-                    total_satoshi_to_second += edge['out_satoshi_amount']
-                    total_usd_to_second += edge['out_usd_amount']
-            # find edges from second to first
-            edge_list_from_second = G.get_edge_data(second_cluster, first_cluster)
-            if edge_list_from_second is not None:
-                num_txes_from_second = len(edge_list_from_second)
-                for edge in edge_list_from_second:
-                    total_satoshi_from_second += edge['out_satoshi_amount']
-                    total_usd_from_second += edge['out_usd_amount']
-            # construct row
-            current.append(first_cluster)
-            current.append(second_cluster)
-            current.append(num_txes_to_second)
-            current.append(num_txes_from_second)
-            current.append(total_satoshi_to_second)
-            current.append(total_satoshi_from_second)
-            current.append(total_usd_to_second)
-            current.append(total_usd_from_second)
-            
-            with open(volume_mount_path + 'wallet-wallet.csv', 'a', newline='') as source:  
-                wtr = csv.writer(source)
-                wtr.writerow(current)
-                source.close()
-        processed_nodes += 1
-        if processed_nodes % 100000 == 0:
-            print("Processed another 100000 wallet nodes, total: ", processed_nodes)
-    G.clear()
-
-def load_wallet_sizes():
-    records = execute_sql_query("select cluster_id, num_address from tmp_btc_wallet;")
-    for wallet in records:
-        wallet_size_map[wallet[0]] = int(wallet[1])
-    print("Wallets loaded with their address sizes")
-
-def generate_linked_wallet_csv():
-    with open(volume_mount_path + 'wallet-wallet.csv', "r") as source:
-        rows = csv.reader( source )
-        with open(volume_mount_path + 'linked-wallet.csv', "w") as result:
-            writer = csv.writer( result )
-            for r in rows:
-                first_wallet = r[0]
-                second_wallet = r[1]
-                first_cluster_size = wallet_size_map.get(first_wallet)
-                if first_cluster_size is None:
-                    first_cluster_size = 0
-                second_cluster_size = wallet_size_map.get(second_wallet)
-                if second_cluster_size is None:
-                    second_cluster_size = 0
-                writer.writerow( (first_wallet, second_wallet, r[2], r[3], r[4], r[5], r[6], r[7], first_cluster_size, second_cluster_size))
-            result.close()
-        source.close()
-    print("Final Link-Wallet data successfully write into a csv file")
-
-def construct_graph():
-    with open(volume_mount_path + 'wallet-edges.csv', "r") as source:
-        row_count = 0
-        for r in source:
-            create_graph(r[0], r[1], r[2], r[3], r[4])
-            if row_count % 50000000 == 0:
-                print("Processed another 50000000 wallet-wallet edges, total: ", row_count)
-            row_count += 1
-    source.close()
-
-    print("Wallet grapgh successfully generated")
-
-def export_csv(file_name):
-    print("Exporting csv data in : " + file_name)
-    reader = open(file_name, 'r')
-    gp_cursor.copy_from(reader, 'tmp_btc_link_wallet', sep=',', columns=['first_cluster', 'second_cluster', 'num_txes_to_second', 'num_txes_from_second', 'total_satoshi_to_second', 'total_satoshi_from_second', 'total_usd_to_second', 'total_usd_from_second', 'first_cluster_size', 'second_cluster_size'])
-    reader.close()
-    gp_connection.commit()
-
-def main():
-    if not gp_connection or not gp_cursor:
-        connects_to_greenplum()
-
-    error_message = None
-    try:
-        # fetch wallet-wallet edges store as a csv
-        #fetch_wallet_edges()
-
-        # construct wallet-wallet graph
-        construct_graph()
-
-        calculate_connected_nodes()
-        print("Wallet-Wallet data successfully write into a csv file")
-
-        # fetch wallet with sizes into memory
-        load_wallet_sizes()
-
-        # create final link_wallet CSV file
-        generate_linked_wallet_csv()
-
-        # export into GP
-        export_csv(volume_mount_path + "linked-wallet.csv")
-        print("tmp_btc_link_wallet filled with table successfully")
-
-        # apply table indexes in GP
-        # apply_sql_query(open(local_file_path + "cluster_table_index.sql", "r").read())
-
-    except Exception as e:
-        error_message = str(e)
+    # rename collections
+    arango_post_actions()
 
     # close arangodb connection
     close_gp_connection()
 
-    if error_message is not None:
-        sys.exit(error_message)
 
 if __name__ == "__main__":
     main()

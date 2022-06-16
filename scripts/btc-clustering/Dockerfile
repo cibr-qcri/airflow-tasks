@@ -9,6 +9,11 @@ ARG gp_port
 ARG gp_username
 ARG gp_password
 ARG gp_db
+ARG arango_host
+ARG arango_port
+ARG arango_username
+ARG arango_password
+ARG arango_db
 
 ENV PYTHONUNBUFFERED=1
 ENV GREENPLUM_HOST=$gp_host
@@ -16,6 +21,11 @@ ENV GREENPLUM_PORT=$gp_port
 ENV GREENPLUM_USERNAME=$gp_username
 ENV GREENPLUM_PASSWORD=$gp_password
 ENV GREENPLUM_DB=$gp_db
+ENV ARANGO_USERNAME=$arango_username
+ENV ARANGO_PASSWORD=$arango_password
+ENV ARANGO_HOST=10.4.8.146
+ENV ARANGO_PORT=$arango_port
+ENV ARANGO_DB=$arango_db
 
 COPY dependencies ./dependencies
 COPY requirements.txt ./

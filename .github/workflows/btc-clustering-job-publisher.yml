@@ -3,6 +3,11 @@ on:
   push:
     branches: [main]
 env:
+  arango_username: ${{ secrets.ARANGO_USERNAME }}
+  arango_password: ${{ secrets.ARANGO_PASSWORD }}
+  arango_host: ${{ secrets.ARANGO_HOST }}
+  arango_port: ${{ secrets.ARANGO_PORT }}
+  arango_db: ${{ secrets.ARANGO_DB }}
   es_host: ${{ secrets.ES_CONNECTION_HOST }}
   es_port: ${{ secrets.ES_CONNECTION_PORT }}
   redis_host: ${{ secrets.CRAWLERS_REDIS_CONNECTION_HOST }}
@@ -44,6 +49,11 @@ jobs:
               then
                 docker build \
                   --build-arg "modified_file=$file" \
+                  --build-arg arango_host=$arango_host \
+                  --build-arg arango_port=$arango_port \
+                  --build-arg arango_username=$arango_username \
+                  --build-arg arango_password=$arango_password \
+                  --build-arg arango_db=$arango_db \
                   --build-arg elasticsearch_host=$es_host \
                   --build-arg elasticsearch_port=$es_port \
                   --build-arg redis_host=$redis_host \
