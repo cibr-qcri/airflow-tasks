@@ -19,7 +19,6 @@ ENV GREENPLUM_DEFI_DB=$gp_defi_db
 
 COPY requirements.txt ./
 COPY data-retriever.py ./data-retriever.py
-COPY dependencies/defi_protocol_schema.sql ./defi_protocol_schema.sql
 
 RUN pip3 install -r requirements.txt
 

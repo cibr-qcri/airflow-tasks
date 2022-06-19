@@ -18,9 +18,11 @@ def connects_to_greenplum():
                                          host=os.getenv('GREENPLUM_HOST'),
                                          port=os.getenv('GREENPLUM_SERVICE_PORT'),
                                          database=os.getenv('GREENPLUM_DEFI_DB'))
+        global gp_cursor
         gp_cursor = gp_connection.cursor()
-        gp_cursor.execute((open('defi_protocol_schema.sql', 'r').read()))
-        gp_connection.commit()
+        gp_cursor.execute("SELECT version();")
+        record = gp_cursor.fetchone()
+        print("You are connected to - ", record, "\n")
     except (Exception, Error) as error:
         sys.exit("Error while connecting to PostgreSQL", error)
 
@@ -40,7 +42,7 @@ def fetch_coin_ids():
     try:
         query = (f"SELECT gecko_id from defilama_protocol "
                  f"WHERE gecko_id IS NOT NULL "
-                 f"AND gecko_id NOT IN (SELECT gecko_id FROM coingecko_protocol);")
+                 f"AND gecko_id NOT IN (SELECT gecko_id FROM eth_defi_protocol);")
         gp_cursor.execute(query)
         coin_ids = [x[0] for x in gp_cursor.fetchall()]
     except (Exception, Error) as error:
@@ -59,7 +61,7 @@ def persist_protocol(coin):
     pdata = [coin.id, coin.symbol, coin.name, coin.asset_platform_id, genesis_date, json.dumps(coin.platforms),
              json.dumps(list(categories)), description, contract_address]
 
-    query = 'INSERT INTO coingecko_protocol (gecko_id, symbol, name, asset_platform_id, genesis_date, platform, ' \
+    query = 'INSERT INTO eth_defi_protocol (gecko_id, symbol, name, asset_platform_id, genesis_date, platform, ' \
             'category, description, contract_address) ' \
             'VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)'
 

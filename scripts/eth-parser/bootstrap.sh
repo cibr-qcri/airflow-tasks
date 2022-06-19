@@ -6,11 +6,6 @@ export LANG=C.UTF-8
 
 echo "Ethereum Parser Staring ...."
 
-# apply database if not exists
-if [[ "$( psql -h "$GREENPLUM_HOST" -p "$GREENPLUM_SERVICE_PORT" --user=$GREENPLUM_USERNAME -c "SELECT 1 FROM pg_database WHERE datname='$GREENPLUM_DB'" | sed -n '3p' | xargs )" != '1' ]] ; then
-  psql -h "$GREENPLUM_HOST" -p "$GREENPLUM_SERVICE_PORT" --user=$GREENPLUM_USERNAME -f /eth_blockchain_schema.sql
-fi
-
 # find last inserted block height for the given range
 LAST_BLOCK_HEIGHT=$(psql -h "$GREENPLUM_HOST" -p "$GREENPLUM_SERVICE_PORT" -d "$GREENPLUM_DB" --user=$GREENPLUM_USERNAME -c "SELECT max(number) FROM eth_block WHERE number >= $START_BLOCK_HEIGHT and number <= $END_BLOCK_HEIGHT;" | sed -n '3p' | xargs)
 re='^[0-9]+$'
