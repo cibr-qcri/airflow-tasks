@@ -33,13 +33,13 @@ default_dag_args = {
     'on_failure_callback': failure_end_job
 }
 
-env_vars_1 = {
-    'START_BLOCK_HEIGHT' : '0',
-    'END_BLOCK_HEIGHT' : '200000',
-    'BATCH_SIZE': '10000',
-    'BITCOIN_DAEMON_HOST': '10.4.8.146',
-    'BITCOIN_DAEMON_PORT': '30239'
-}
+# env_vars_1 = {
+#     'START_BLOCK_HEIGHT' : '0',
+#     'END_BLOCK_HEIGHT' : '200000',
+#     'BATCH_SIZE': '10000',
+#     'BITCOIN_DAEMON_HOST': '10.4.8.146',
+#     'BITCOIN_DAEMON_PORT': '30239'
+# }
 
 env_vars_2 = {
     'START_BLOCK_HEIGHT' : '200000',
@@ -94,18 +94,18 @@ with models.DAG(
         schedule_interval='@weekly',
         default_args=default_dag_args) as dag:
 
-    task_parser_1 = KubernetesPodOperator(
-        namespace='default',
-        name="btc_parsing_task_1-200000",
-        image='toshiqcri/btc-etl-parser:latest',
-        image_pull_policy='Always',
-        task_id="btc_parsing_task_1-200000",
-        do_xcom_push=False,
-        is_delete_operator_pod=False,
-        volumes=[volume],
-        volume_mounts=[volume_mount],
-        env_vars = env_vars_1
-    )
+    # task_parser_1 = KubernetesPodOperator(
+    #     namespace='default',
+    #     name="btc_parsing_task_1-200000",
+    #     image='toshiqcri/btc-etl-parser:latest',
+    #     image_pull_policy='Always',
+    #     task_id="btc_parsing_task_1-200000",
+    #     do_xcom_push=False,
+    #     is_delete_operator_pod=False,
+    #     volumes=[volume],
+    #     volume_mounts=[volume_mount],
+    #     env_vars = env_vars_1
+    # )
 
     task_parser_2 = KubernetesPodOperator(
         namespace='default',
@@ -183,4 +183,4 @@ with models.DAG(
         env_vars = env_vars_7
     )
 
-[task_parser_1, task_parser_2, task_parser_3, task_parser_4, task_parser_5, task_parser_6, task_parser_7]
+[task_parser_2, task_parser_3, task_parser_4, task_parser_5, task_parser_6, task_parser_7]

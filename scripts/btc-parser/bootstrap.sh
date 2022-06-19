@@ -16,6 +16,7 @@ if [[ "$( psql -h "$GREENPLUM_HOST" -p "$GREENPLUM_SERVICE_PORT" --user=gpadmin 
   psql -h "$GREENPLUM_SERVICE_HOST" -p "$GREENPLUM_SERVICE_PORT" --user=gpadmin -f btc_blockchain_schema.sql
 fi
 
+export initial_start_block=${START_BLOCK_HEIGHT}
 file=data/last_processed_number-$START_BLOCK_HEIGHT-$END_BLOCK_HEIGHT.txt
 if [ -f "$file" ]; then
     START_BLOCK_HEIGHT=$(< data/last_processed_number-$START_BLOCK_HEIGHT-$END_BLOCK_HEIGHT.txt)
@@ -46,7 +47,7 @@ export_and_store_blocks() {
   echo "Data successfully uploaded to GreenplumpDB from block range $((start_block_height))-$((end_block_height))"
   purge_data
 
-  echo "$((end_block_height))" > data/last_processed_number-$START_BLOCK_HEIGHT-$END_BLOCK_HEIGHT.txt
+  echo "$((end_block_height))" > data/last_processed_number-$initial_start_block-$END_BLOCK_HEIGHT.txt
 }
 
 while sleep 1; do
