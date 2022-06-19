@@ -52,12 +52,12 @@ def persist():
     engine = create_engine(db_url)
     protocols.to_sql('temporary_table', engine, if_exists='append', method='multi', index=False)
     with engine.begin() as cnx:
-        insert_sql = 'INSERT INTO defilama_protocol (id, name, address, symbol, url, description, chain, gecko_id, ' \
-                     'cmc_id, twitter, category, chains) ' \
+        insert_sql = 'INSERT INTO eth_defi_data_provider (id, name, address, symbol, url, description, chain, ' \
+                     'gecko_id, cmc_id, twitter, category, chains) ' \
                      'SELECT id, name, address, symbol, url, description, chain, gecko_id, cmc_id, twitter, ' \
                      'category, chains ' \
                      'FROM temporary_table ' \
-                     'WHERE id NOT IN (SELECT DISTINCT id FROM defilama_protocol)'
+                     'WHERE id NOT IN (SELECT DISTINCT id FROM eth_defi_data_provider)'
         cnx.execute(insert_sql)
 
 
