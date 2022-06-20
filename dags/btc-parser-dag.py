@@ -62,7 +62,7 @@ affinity_2 = {
                 {
                     "key": "kubernetes.io/hostname",
                     "operator": "In",
-                    "values": ["cybubtoshicl022"]
+                    "values": ["cybubtoshicl027"]
                 }
             ]
           }
