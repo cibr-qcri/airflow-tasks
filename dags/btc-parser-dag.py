@@ -33,6 +33,120 @@ default_dag_args = {
     'on_failure_callback': failure_end_job
 }
 
+affinity_1 = {
+    "nodeAffinity": {
+      "preferredDuringSchedulingIgnoredDuringExecution": [
+        {
+          "weight": 1,
+          "preference": {
+            "matchExpressions": [
+                {
+                    "key": "kubernetes.io/hostname",
+                    "operator": "In",
+                    "values": ["cybubtoshicl012"]
+                }
+            ]
+          }
+        }
+      ]
+    }
+}
+
+affinity_2 = {
+    "nodeAffinity": {
+      "preferredDuringSchedulingIgnoredDuringExecution": [
+        {
+          "weight": 1,
+          "preference": {
+            "matchExpressions": [
+                {
+                    "key": "kubernetes.io/hostname",
+                    "operator": "In",
+                    "values": ["cybubtoshicl022"]
+                }
+            ]
+          }
+        }
+      ]
+    }
+}
+
+affinity_3 = {
+    "nodeAffinity": {
+      "preferredDuringSchedulingIgnoredDuringExecution": [
+        {
+          "weight": 1,
+          "preference": {
+            "matchExpressions": [
+                {
+                    "key": "kubernetes.io/hostname",
+                    "operator": "In",
+                    "values": ["cybubtoshicl023"]
+                }
+            ]
+          }
+        }
+      ]
+    }
+}
+
+affinity_4 = {
+    "nodeAffinity": {
+      "preferredDuringSchedulingIgnoredDuringExecution": [
+        {
+          "weight": 1,
+          "preference": {
+            "matchExpressions": [
+                {
+                    "key": "kubernetes.io/hostname",
+                    "operator": "In",
+                    "values": ["cybubtoshicl024"]
+                }
+            ]
+          }
+        }
+      ]
+    }
+}
+
+affinity_5 = {
+    "nodeAffinity": {
+      "preferredDuringSchedulingIgnoredDuringExecution": [
+        {
+          "weight": 1,
+          "preference": {
+            "matchExpressions": [
+                {
+                    "key": "kubernetes.io/hostname",
+                    "operator": "In",
+                    "values": ["cybubtoshicl025"]
+                }
+            ]
+          }
+        }
+      ]
+    }
+}
+
+affinity_6 = {
+    "nodeAffinity": {
+      "preferredDuringSchedulingIgnoredDuringExecution": [
+        {
+          "weight": 1,
+          "preference": {
+            "matchExpressions": [
+                {
+                    "key": "kubernetes.io/hostname",
+                    "operator": "In",
+                    "values": ["cybubtoshicl026"]
+                }
+            ]
+          }
+        }
+      ]
+    }
+}
+
 # env_vars_1 = {
 #     'START_BLOCK_HEIGHT' : '0',
 #     'END_BLOCK_HEIGHT' : '200000',
@@ -117,7 +231,8 @@ with models.DAG(
         is_delete_operator_pod=False,
         volumes=[volume],
         volume_mounts=[volume_mount],
-        env_vars = env_vars_2
+        env_vars = env_vars_2,
+        affinity=affinity_1
     )
 
     task_parser_3 = KubernetesPodOperator(
@@ -130,7 +245,8 @@ with models.DAG(
         is_delete_operator_pod=False,
         volumes=[volume],
         volume_mounts=[volume_mount],
-        env_vars = env_vars_3
+        env_vars = env_vars_3,
+        affinity=affinity_2
     )
 
     task_parser_4 = KubernetesPodOperator(
@@ -143,7 +259,8 @@ with models.DAG(
         is_delete_operator_pod=False,
         volumes=[volume],
         volume_mounts=[volume_mount],
-        env_vars = env_vars_4
+        env_vars = env_vars_4,
+        affinity=affinity_3
     )
 
     task_parser_5 = KubernetesPodOperator(
@@ -156,7 +273,8 @@ with models.DAG(
         is_delete_operator_pod=False,
         volumes=[volume],
         volume_mounts=[volume_mount],
-        env_vars = env_vars_5
+        env_vars = env_vars_5,
+        affinity=affinity_4
     )
 
     task_parser_6 = KubernetesPodOperator(
@@ -169,7 +287,8 @@ with models.DAG(
         is_delete_operator_pod=False,
         volumes=[volume],
         volume_mounts=[volume_mount],
-        env_vars = env_vars_6
+        env_vars = env_vars_6,
+        affinity=affinity_5
     )
 
     task_parser_7 = KubernetesPodOperator(
@@ -180,7 +299,8 @@ with models.DAG(
         task_id="btc_parsing_task_700000-800000",
         do_xcom_push=False,
         is_delete_operator_pod=False,
-        env_vars = env_vars_7
+        env_vars = env_vars_7,
+        affinity=affinity_6
     )
 
 [task_parser_2, task_parser_3, task_parser_4, task_parser_5, task_parser_6, task_parser_7]

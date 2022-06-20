@@ -33,6 +33,14 @@ default_dag_args = {
     'on_failure_callback': failure_end_job
 }
 
+env_vars_2 = {
+    'START_BLOCK_HEIGHT' : '600000',
+    'END_BLOCK_HEIGHT' : '300000',
+    'BATCH_SIZE': '10000',
+    'BITCOIN_DAEMON_HOST': '10.4.8.131',
+    'BITCOIN_DAEMON_PORT': '30234'
+}
+
 with models.DAG(
         dag_id='eth-parser-dag',
         schedule_interval=None,
