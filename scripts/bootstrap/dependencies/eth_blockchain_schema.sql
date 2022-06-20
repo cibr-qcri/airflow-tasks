@@ -129,8 +129,10 @@ CREATE TABLE IF NOT EXISTS eth_defi_data_provider (
 );
 CREATE TABLE IF NOT EXISTS eth_defi_protocol (
   gecko_id VARCHAR PRIMARY KEY NOT NULL,
-  symbol VARCHAR, name VARCHAR, asset_platform_id VARCHAR,
-  genesis_date DATE NULL, platform JSONB,
-  category JSONB, description TEXT,
-  contract_address VARCHAR
+  symbol VARCHAR,
+  name VARCHAR,
+  genesis_date DATE NULL,
+  category JSONB,
+  description TEXT,
+  contract VARCHAR
 );

@@ -23,7 +23,7 @@ def connects_to_greenplum():
                                          password=os.getenv('GREENPLUM_PASSWORD'),
                                          host=os.getenv('GREENPLUM_HOST'),
                                          port=os.getenv('GREENPLUM_SERVICE_PORT'),
-                                         database=os.getenv('GREENPLUM_DEFI_DB'))
+                                         database=os.getenv('GREENPLUM_DB'))
         gp_cursor = gp_connection.cursor()
         gp_cursor.execute((open('defi_protocol_schema.sql', 'r').read()))
         gp_connection.commit()
@@ -47,7 +47,7 @@ def close_gp_connection():
 def persist():
     db_url = 'postgresql+psycopg2://{}:{}@{}:{}/{}' \
         .format(os.getenv('GREENPLUM_USERNAME'), os.getenv('GREENPLUM_PASSWORD'),
-                os.getenv('GREENPLUM_HOST'), os.getenv('GREENPLUM_SERVICE_PORT'), os.getenv('GREENPLUM_DEFI_DB'))
+                os.getenv('GREENPLUM_HOST'), os.getenv('GREENPLUM_SERVICE_PORT'), os.getenv('GREENPLUM_DB'))
 
     engine = create_engine(db_url)
     protocols.to_sql('temporary_table', engine, if_exists='append', method='multi', index=False)

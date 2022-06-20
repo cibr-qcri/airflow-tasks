@@ -2,12 +2,6 @@ name: Defilama Protol Fetcher Job Publisher
 on:
   push:
     branches: [main]
-env:
-  gp_host: ${{ secrets.GP_CONNECTION_HOST }}
-  gp_host_port: ${{ secrets.GP_PORT }}
-  gp_username: ${{ secrets.GP_CONNECTION_USERNAME }}
-  gp_password: ""
-  gp_defi_db: ${{ secrets.GP_DEFI_DB }}
 jobs:
   push_to_registry:
     name: Push Docker image to Docker Hub
@@ -35,11 +29,6 @@ jobs:
             if [[ $changed_file == scripts/defilama-protocol-fetcher/* ]] ;
             then
               docker build \
-                --build-arg gp_host=$gp_host \
-                --build-arg gp_host_port=$gp_host_port \
-                --build-arg gp_username=$gp_username \
-                --build-arg gp_password=$gp_password \
-                --build-arg gp_defi_db=$gp_defi_db \
                 -t "toshiqcri/defilama-protocol-fetcher:latest" \
                 --no-cache .
 

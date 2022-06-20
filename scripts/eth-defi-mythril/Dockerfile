@@ -9,4 +9,6 @@ ENV ETHEREUM_CLIENT_PORT=$ETHEREUM_CLIENT_PORT
 
 RUN pip3 install mythril
 
-ENTRYPOINT ["sleep", "1d"]
+COPY analyzer.py ./analyzer.py
+
+CMD [ "stdbuf", "-oL", "python3", "analyzer.py" ]
