@@ -1,9 +1,11 @@
 FROM mythril/myth
 LABEL maintainer.0="CIBR-QCRI Team"
 
-#RUN apt-get update
+ARG ETHEREUM_CLIENT_HOST=10.4.8.131
+ARG ETHEREUM_CLIENT_PORT=31389
 
-#RUN apt-get -y install git python3-pip
+ENV ETHEREUM_CLIENT_HOST=$ETHEREUM_CLIENT_HOST
+ENV ETHEREUM_CLIENT_PORT=$ETHEREUM_CLIENT_PORT
 
 RUN pip3 install mythril
 

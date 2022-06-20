@@ -1,24 +1,41 @@
+import json
 import os
 import sys
 
+import subprocess
 import psycopg2
 from psycopg2 import Error
+
+
+def persist_report(report):
+
 
 
 def get_eth_contracts():
     d = dict()
     query = "SELECT gecko_id, symbol, name, platform->'ethereum' " \
-            "FROM coingecko_protocol WHERE platform::jsonb ? 'ethereum'"
+            "FROM eth_defi_protocol WHERE platform::jsonb ? 'ethereum'"
     try:
         gp_cursor.execute(query)
         results = gp_cursor.fetchall()
         for result in results:
-            d[result[3]] = {'gecko_id': result[0], 'symbol': result[1], 'name': result[2], 'contract': result[3]}
+            contract = result[3]
+            report = {'symbol': result[1], 'name': result[2], 'source': 'mythril', 'contract': contract,
+                           'data': analyze_contract(contract)}
+            persist_report(report)
     except (Exception, Error) as error:
         print("Error while closing the connection to PostgreSQL", error)
     finally:
         gp_connection.commit()
     return d
+
+
+def analyze_contract(contract):
+    rpc = '{}:{}'.format(os.getenv('ETHEREUM_CLIENT_HOST'), os.getenv('ETHEREUM_CLIENT_PORT'))
+    result = subprocess.run(['myth', 'analyze', '-a', contract, '-o', 'jsonv2', '--rpc', rpc], stdout=subprocess.PIPE)\
+        .stdout.decode('utf-8')
+
+    return json.loads(result)
 
 
 def connects_to_greenplum():
