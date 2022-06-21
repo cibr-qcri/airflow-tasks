@@ -33,6 +33,14 @@ default_dag_args = {
     'on_failure_callback': failure_end_job
 }
 
+env_vars_1 = {
+    'START_BLOCK_HEIGHT' : '6320000',
+    'END_BLOCK_HEIGHT' : '8000000',
+    'BATCH_SIZE': '10000',
+    'BITCOIN_DAEMON_HOST': '10.4.8.131',
+    'BITCOIN_DAEMON_PORT': '31389'
+}
+
 env_vars_2 = {
     'START_BLOCK_HEIGHT' : '8000000',
     'END_BLOCK_HEIGHT' : '10000000',
@@ -69,6 +77,19 @@ with models.DAG(
         dag_id='eth-parser-dag',
         schedule_interval=None,
         start_date=YESTERDAY) as dag:
+
+    task_parser_1 = KubernetesPodOperator(
+        namespace='default',
+        name="eth_parsing_task_6320000-8000000",
+        image='toshiqcri/eth-etl-parser:latest',
+        image_pull_policy='Always',
+        task_id="eth_parsing_task_6320000-8000000",
+        do_xcom_push=False,
+        volumes=[volume],
+        volume_mounts=[volume_mount],
+        env_vars = env_vars_1,
+        is_delete_operator_pod=False
+    )
 
     task_parser_2 = KubernetesPodOperator(
         namespace='default',
@@ -122,5 +143,5 @@ with models.DAG(
         is_delete_operator_pod=False
     )
 
-[task_parser_2, task_parser_3, task_parser_4, task_parser_5]
+[task_parser_1, task_parser_2, task_parser_3, task_parser_4, task_parser_5]
 
