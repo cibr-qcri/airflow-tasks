@@ -6,13 +6,6 @@ export LANG=C.UTF-8
 
 echo "Ethereum Parser Staring ...."
 
-# find last inserted block height for the given range
-LAST_BLOCK_HEIGHT=$(psql -h "$GREENPLUM_HOST" -p "$GREENPLUM_SERVICE_PORT" -d "$GREENPLUM_DB" --user=$GREENPLUM_USERNAME -c "SELECT max(number) FROM eth_block WHERE number >= $START_BLOCK_HEIGHT and number <= $END_BLOCK_HEIGHT;" | sed -n '3p' | xargs)
-re='^[0-9]+$'
-if [[ $LAST_BLOCK_HEIGHT =~ $re ]] ; then
-   START_BLOC_HEIGHTK=$LAST_BLOCK_HEIGHT
-fi
-
 export_blocks_and_transactions() {
   local start_block_height=$1
   local end_block_height=$2
@@ -90,11 +83,21 @@ export_data() {
   echo "Contract data successfully uploaded to the GreenplumpDB for block range $((start_block_height))-$((end_block_height))"
   psql -h "$GREENPLUM_HOST" -p "$GREENPLUM_SERVICE_PORT" -d "$GREENPLUM_DB" --user=$GREENPLUM_USERNAME -c "\\COPY eth_token(address,symbol,name,decimals,total_supply,block_number) FROM tokens.csv CSV DELIMITER E','"
   echo "Tokens data successfully uploaded to the GreenplumpDB for block range $((start_block_height))-$((end_block_height))"
+
+  echo "$((end_block_height))" > data/last_processed_number-$initial_start_block-$END_BLOCK_HEIGHT.txt
 }
 
 purge_csv() {
   rm blocks.csv transactions.csv token_transfers.csv receipts.csv logs.csv contracts.csv tokens.csv
 }
+
+export initial_start_block=${START_BLOCK_HEIGHT}
+file=data/last_processed_number-$START_BLOCK_HEIGHT-$END_BLOCK_HEIGHT.txt
+if [ -f "$file" ]; then
+    START_BLOCK_HEIGHT=$(< data/last_processed_number-$START_BLOCK_HEIGHT-$END_BLOCK_HEIGHT.txt)
+else 
+    echo "File last_processed_number-$START_BLOCK_HEIGHT-$END_BLOCK_HEIGHT.txt does not exist"
+fi 
 
 echo "Staring block height is $((START_BLOCK_HEIGHT))"
 export start_block_height=${START_BLOCK_HEIGHT}

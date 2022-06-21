@@ -9,7 +9,7 @@ YESTERDAY = datetime.datetime.now() - datetime.timedelta(days=1)
 
 volume_mount = VolumeMount(
     'cibr-airflow-pvc',
-    mount_path='/opt/airflow/dags/',
+    mount_path='/blockchain-parser/data/',
     sub_path=None,
     read_only=False
 )
@@ -34,11 +34,35 @@ default_dag_args = {
 }
 
 env_vars_2 = {
-    'START_BLOCK_HEIGHT' : '600000',
-    'END_BLOCK_HEIGHT' : '300000',
+    'START_BLOCK_HEIGHT' : '8000000',
+    'END_BLOCK_HEIGHT' : '10000000',
     'BATCH_SIZE': '10000',
     'BITCOIN_DAEMON_HOST': '10.4.8.131',
-    'BITCOIN_DAEMON_PORT': '30234'
+    'BITCOIN_DAEMON_PORT': '31390'
+}
+
+env_vars_3 = {
+    'START_BLOCK_HEIGHT' : '10000000',
+    'END_BLOCK_HEIGHT' : '12000000',
+    'BATCH_SIZE': '10000',
+    'BITCOIN_DAEMON_HOST': '10.4.8.131',
+    'BITCOIN_DAEMON_PORT': '31391'
+}
+
+env_vars_4 = {
+    'START_BLOCK_HEIGHT' : '12000000',
+    'END_BLOCK_HEIGHT' : '14000000',
+    'BATCH_SIZE': '10000',
+    'BITCOIN_DAEMON_HOST': '10.4.8.131',
+    'BITCOIN_DAEMON_PORT': '31392'
+}
+
+env_vars_5 = {
+    'START_BLOCK_HEIGHT' : '14000000',
+    'END_BLOCK_HEIGHT' : '16000000',
+    'BATCH_SIZE': '10000',
+    'BITCOIN_DAEMON_HOST': '10.4.8.131',
+    'BITCOIN_DAEMON_PORT': '31393'
 }
 
 with models.DAG(
@@ -46,17 +70,57 @@ with models.DAG(
         schedule_interval=None,
         start_date=YESTERDAY) as dag:
 
-    task_parser = KubernetesPodOperator(
+    task_parser_2 = KubernetesPodOperator(
         namespace='default',
-        name="eth_parsing_task",
+        name="eth_parsing_task_8000000-10000000",
         image='toshiqcri/eth-etl-parser:latest',
         image_pull_policy='Always',
-        task_id="eth_parsing_task",
+        task_id="eth_parsing_task_8000000-10000000",
         do_xcom_push=False,
         volumes=[volume],
         volume_mounts=[volume_mount],
+        env_vars = env_vars_2,
         is_delete_operator_pod=False
     )
 
-task_parser
+    task_parser_3 = KubernetesPodOperator(
+        namespace='default',
+        name="eth_parsing_task_10000000-12000000",
+        image='toshiqcri/eth-etl-parser:latest',
+        image_pull_policy='Always',
+        task_id="eth_parsing_task_10000000-12000000",
+        do_xcom_push=False,
+        volumes=[volume],
+        volume_mounts=[volume_mount],
+        env_vars = env_vars_3,
+        is_delete_operator_pod=False
+    )
+
+    task_parser_4 = KubernetesPodOperator(
+        namespace='default',
+        name="eth_parsing_task_12000000-14000000",
+        image='toshiqcri/eth-etl-parser:latest',
+        image_pull_policy='Always',
+        task_id="eth_parsing_task_12000000-14000000",
+        do_xcom_push=False,
+        volumes=[volume],
+        volume_mounts=[volume_mount],
+        env_vars = env_vars_4,
+        is_delete_operator_pod=False
+    )
+
+    task_parser_5 = KubernetesPodOperator(
+        namespace='default',
+        name="eth_parsing_task_14000000-16000000",
+        image='toshiqcri/eth-etl-parser:latest',
+        image_pull_policy='Always',
+        task_id="eth_parsing_task_14000000-16000000",
+        do_xcom_push=False,
+        volumes=[volume],
+        volume_mounts=[volume_mount],
+        env_vars = env_vars_5,
+        is_delete_operator_pod=False
+    )
+
+[task_parser_2, task_parser_3, task_parser_4, task_parser_5]
 

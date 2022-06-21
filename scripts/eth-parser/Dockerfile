@@ -30,13 +30,17 @@ ENV GREENPLUM_USERNAME=$GREENPLUM_USERNAME
 ENV GREENPLUM_PASSWORD=$GREENPLUM_PASSWORD
 ENV GREENPLUM_DB=$GREENPLUM_DB
 
-COPY bootstrap.sh /bootstrap.sh
-COPY dependencies/eth_blockchain_schema.sql /eth_blockchain_schema.sql
+RUN mkdir /blockchain-parser
+RUN mkdir /blockchain-parser/data
+WORKDIR "/blockchain-parser"
+
+COPY bootstrap.sh ./bootstrap.sh
+COPY dependencies/eth_blockchain_schema.sql ./eth_blockchain_schema.sql
 
 RUN pip3 install ethereum-etl
-RUN chmod 755 /eth-bootstrap.py.sh
-RUN chmod 755 /eth_blockchain_schema.sql
+RUN chmod 755 ./eth-bootstrap.py.sh
+RUN chmod 755 ./eth_blockchain_schema.sql
 
 EXPOSE 5432 8529 30872
 
-ENTRYPOINT ["/bootstrap.sh"]
+ENTRYPOINT ["./bootstrap.sh"]
