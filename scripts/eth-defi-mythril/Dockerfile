@@ -1,9 +1,8 @@
-FROM python:3.10
-
-WORKDIR /usr/src/job
-
+FROM mythril/myth
 LABEL maintainer.0="CIBR-QCRI Team"
 
+ARG eth_client_host=10.4.8.131
+ARG eth_client_port=31389
 ARG gp_host=10.4.8.131
 ARG gp_host_port=5432
 ARG gp_username=gpadmin
@@ -16,10 +15,13 @@ ENV GREENPLUM_PORT=$gp_host_port
 ENV GREENPLUM_USERNAME=$gp_username
 ENV GREENPLUM_PASSWORD=$gp_password
 ENV GREENPLUM_DB=$gp_db
+ENV ETHEREUM_CLIENT_HOST=$eth_client_host
+ENV ETHEREUM_CLIENT_PORT=$eth_client_port
 
-COPY requirements.txt ./
-COPY data-retriever.py ./data-retriever.py
+RUN apt-get install -y libpq-dev python-dev
 
-RUN pip3 install -r requirements.txt
+RUN pip3 install mythril psycopg2
 
-CMD [ "stdbuf", "-oL", "python3", "data-retriever.py" ]
+COPY analyzer.py ./analyzer.py
+
+ENTRYPOINT [ "python3", "analyzer.py" ]

@@ -44,4 +44,14 @@ with models.DAG(
         is_delete_operator_pod=False
     )
 
-defilama_fetcher >> coingecko_fetcher
+    mythril_analyzer = KubernetesPodOperator(
+        namespace='default',
+        name='mythril_analyzer_task',
+        image='toshiqcri/eth-defi-mythril:latest',
+        image_pull_policy='Always',
+        task_id='mythril_analyzer_task',
+        do_xcom_push=False,
+        is_delete_operator_pod=False
+    )
+
+defilama_fetcher >> coingecko_fetcher  >>  mythril_analyzer

@@ -17,7 +17,7 @@ def connects_to_greenplum():
                                          password=os.getenv('GREENPLUM_PASSWORD'),
                                          host=os.getenv('GREENPLUM_HOST'),
                                          port=os.getenv('GREENPLUM_SERVICE_PORT'),
-                                         database=os.getenv('GREENPLUM_DEFI_DB'))
+                                         database=os.getenv('GREENPLUM_DB'))
         global gp_cursor
         gp_cursor = gp_connection.cursor()
         gp_cursor.execute("SELECT version();")
@@ -40,7 +40,7 @@ def close_gp_connection():
 def fetch_coin_ids():
     coin_ids = []
     try:
-        query = (f"SELECT gecko_id from defilama_protocol "
+        query = (f"SELECT gecko_id from eth_defi_data_provider "
                  f"WHERE gecko_id IS NOT NULL "
                  f"AND gecko_id NOT IN (SELECT gecko_id FROM eth_defi_protocol);")
         gp_cursor.execute(query)
@@ -53,18 +53,14 @@ def fetch_coin_ids():
     return coin_ids
 
 
-def persist_protocol(coin):
+def persist_protocol(coin, contract):
     description = SimpleNamespace(**coin.description).en if coin.description else ''
     categories = [x for x in coin.categories if x is not None]
     genesis_date = coin.genesis_date if coin.genesis_date else None
-    contract_address = coin.contract_address if hasattr(coin, 'contract_address') else None
-    pdata = [coin.id, coin.symbol, coin.name, coin.asset_platform_id, genesis_date, json.dumps(coin.platforms),
-             json.dumps(list(categories)), description, contract_address]
+    pdata = [coin.id, coin.symbol, coin.name, genesis_date, json.dumps(list(categories)), description, contract]
 
-    query = 'INSERT INTO eth_defi_protocol (gecko_id, symbol, name, asset_platform_id, genesis_date, platform, ' \
-            'category, description, contract_address) ' \
-            'VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)'
-
+    query = 'INSERT INTO eth_defi_protocol (gecko_id, symbol, name, genesis_date, category, description, contract) ' \
+            'VALUES (%s, %s, %s, %s, %s, %s, %s)'
     try:
         gp_cursor.execute(query, tuple(pdata))
     except (Exception, Error) as error:
@@ -79,7 +75,9 @@ def fetch_coins(coin_ids):
         try:
             coin = cg.get_coin_by_id(coin_id)
             coin = SimpleNamespace(**coin)
-            persist_protocol(coin)
+            platforms = SimpleNamespace(**coin.platforms)
+            if hasattr(platforms, 'ethereum'):
+                persist_protocol(coin, platforms.ethereum)
         except ValueError:
             print('Could not find coin with the given id: :' + coin_id)
         time.sleep(1.2)

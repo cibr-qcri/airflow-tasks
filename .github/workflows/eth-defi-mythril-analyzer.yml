@@ -1,4 +1,4 @@
-name: Coingecko Protol Fetcher Job Publisher
+name: Mythril Smart Contract Analyzer Job Publisher
 on:
   push:
     branches: [main]
@@ -24,15 +24,15 @@ jobs:
         uses: jitterbit/get-changed-files@v1
       - name: Build & Push Containers to DockerHub
         run: |
-          cd scripts/coingecko-protocol-fetcher
+          cd scripts/eth-defi-mythril
           for changed_file in ${{ steps.modified-files.outputs.all }}; do
-            if [[ $changed_file == scripts/coingecko-protocol-fetcher/* ]] ;
+            if [[ $changed_file == scripts/eth-defi-mythril/* ]] ;
             then
               docker build \
-                -t "toshiqcri/coingecko-protocol-fetcher:latest" \
+                -t "toshiqcri/eth-defi-mythril:latest" \
                 --no-cache .
 
-              docker push "toshiqcri/coingecko-protocol-fetcher:latest"
+              docker push "toshiqcri/eth-defi-mythril:latest"
               break
             fi
           done
