@@ -62,27 +62,27 @@ export_traces() {
 }
 
 export_data() {
-  sed -i '1d' blocks.csv
-  sed -i '1d' transactions.csv
-  sed -i '1d' token_transfers.csv
-  sed -i '1d' receipts.csv
-  sed -i '1d' logs.csv
-  sed -i '1d' contracts.csv
-  sed -i '1d' tokens.csv
+  # sed -i '1d' blocks.csv
+  # sed -i '1d' transactions.csv
+  # sed -i '1d' token_transfers.csv
+  # sed -i '1d' receipts.csv
+  # sed -i '1d' logs.csv
+  # sed -i '1d' contracts.csv
+  # sed -i '1d' tokens.csv
 
-  psql -h "$GREENPLUM_HOST" -p "$GREENPLUM_SERVICE_PORT" -d "$GREENPLUM_DB" --user=$GREENPLUM_USERNAME -c "\\COPY eth_block(number,hash,parent_hash,nonce,sha3_uncles,logs_bloom,transactions_root,state_root,receipts_root,miner,difficulty,total_difficulty,size,extra_data,gas_limit,gas_used,timestamp,transaction_count,base_fee_per_gas) FROM blocks.csv CSV DELIMITER E','"
-  psql -h "$GREENPLUM_HOST" -p "$GREENPLUM_SERVICE_PORT" -d "$GREENPLUM_DB" --user=$GREENPLUM_USERNAME -c "\\COPY eth_transaction(hash,nonce,block_hash,block_number,transaction_index,from_address,to_address,value,gas,gas_price,input,block_timestamp,max_fee_per_gas,max_priority_fee_per_gas,transaction_type) FROM transactions.csv CSV DELIMITER E','"
-  echo "Blocks and Txes data successfully uploaded to the GreenplumpDB for block range $((start_block_height))-$((end_block_height))"
-  psql -h "$GREENPLUM_HOST" -p "$GREENPLUM_SERVICE_PORT" -d "$GREENPLUM_DB" --user=$GREENPLUM_USERNAME -c "\\COPY eth_token_transfer(token_address,from_address,to_address,value,transaction_hash,log_index,block_number) FROM token_transfers.csv CSV DELIMITER E','"
-  echo "Token transfer data successfully uploaded to the GreenplumpDB for block range $((start_block_height))-$((end_block_height))"
-  psql -h "$GREENPLUM_HOST" -p "$GREENPLUM_SERVICE_PORT" -d "$GREENPLUM_DB" --user=$GREENPLUM_USERNAME -c "\\COPY eth_receipt(transaction_hash,transaction_index,block_hash,block_number,cumulative_gas_used,gas_used,contract_address,root,status,effective_gas_price) FROM receipts.csv CSV DELIMITER E','"
-  echo "Receipts data successfully uploaded to the GreenplumpDB for block range $((start_block_height))-$((end_block_height))"
-  psql -h "$GREENPLUM_HOST" -p "$GREENPLUM_SERVICE_PORT" -d "$GREENPLUM_DB" --user=$GREENPLUM_USERNAME -c "\\COPY eth_log(log_index,transaction_hash,transaction_index,block_hash,block_number,address,data,topics) FROM logs.csv CSV DELIMITER E','"
-  echo "Logs data successfully uploaded to the GreenplumpDB for block range $((start_block_height))-$((end_block_height))"
-  psql -h "$GREENPLUM_HOST" -p "$GREENPLUM_SERVICE_PORT" -d "$GREENPLUM_DB" --user=$GREENPLUM_USERNAME -c "\\COPY eth_contract(address,bytecode,function_sighashes,is_erc20,is_erc721,block_number) FROM contracts.csv CSV DELIMITER E','"
-  echo "Contract data successfully uploaded to the GreenplumpDB for block range $((start_block_height))-$((end_block_height))"
-  psql -h "$GREENPLUM_HOST" -p "$GREENPLUM_SERVICE_PORT" -d "$GREENPLUM_DB" --user=$GREENPLUM_USERNAME -c "\\COPY eth_token(address,symbol,name,decimals,total_supply,block_number) FROM tokens.csv CSV DELIMITER E','"
-  echo "Tokens data successfully uploaded to the GreenplumpDB for block range $((start_block_height))-$((end_block_height))"
+  # psql -h "$GREENPLUM_HOST" -p "$GREENPLUM_SERVICE_PORT" -d "$GREENPLUM_DB" --user=$GREENPLUM_USERNAME -c "\\COPY eth_block(number,hash,parent_hash,nonce,sha3_uncles,logs_bloom,transactions_root,state_root,receipts_root,miner,difficulty,total_difficulty,size,extra_data,gas_limit,gas_used,timestamp,transaction_count,base_fee_per_gas) FROM blocks.csv CSV DELIMITER E','"
+  # psql -h "$GREENPLUM_HOST" -p "$GREENPLUM_SERVICE_PORT" -d "$GREENPLUM_DB" --user=$GREENPLUM_USERNAME -c "\\COPY eth_transaction(hash,nonce,block_hash,block_number,transaction_index,from_address,to_address,value,gas,gas_price,input,block_timestamp,max_fee_per_gas,max_priority_fee_per_gas,transaction_type) FROM transactions.csv CSV DELIMITER E','"
+  # echo "Blocks and Txes data successfully uploaded to the GreenplumpDB for block range $((start_block_height))-$((end_block_height))"
+  # psql -h "$GREENPLUM_HOST" -p "$GREENPLUM_SERVICE_PORT" -d "$GREENPLUM_DB" --user=$GREENPLUM_USERNAME -c "\\COPY eth_token_transfer(token_address,from_address,to_address,value,transaction_hash,log_index,block_number) FROM token_transfers.csv CSV DELIMITER E','"
+  # echo "Token transfer data successfully uploaded to the GreenplumpDB for block range $((start_block_height))-$((end_block_height))"
+  # psql -h "$GREENPLUM_HOST" -p "$GREENPLUM_SERVICE_PORT" -d "$GREENPLUM_DB" --user=$GREENPLUM_USERNAME -c "\\COPY eth_receipt(transaction_hash,transaction_index,block_hash,block_number,cumulative_gas_used,gas_used,contract_address,root,status,effective_gas_price) FROM receipts.csv CSV DELIMITER E','"
+  # echo "Receipts data successfully uploaded to the GreenplumpDB for block range $((start_block_height))-$((end_block_height))"
+  # psql -h "$GREENPLUM_HOST" -p "$GREENPLUM_SERVICE_PORT" -d "$GREENPLUM_DB" --user=$GREENPLUM_USERNAME -c "\\COPY eth_log(log_index,transaction_hash,transaction_index,block_hash,block_number,address,data,topics) FROM logs.csv CSV DELIMITER E','"
+  # echo "Logs data successfully uploaded to the GreenplumpDB for block range $((start_block_height))-$((end_block_height))"
+  # psql -h "$GREENPLUM_HOST" -p "$GREENPLUM_SERVICE_PORT" -d "$GREENPLUM_DB" --user=$GREENPLUM_USERNAME -c "\\COPY eth_contract(address,bytecode,function_sighashes,is_erc20,is_erc721,block_number) FROM contracts.csv CSV DELIMITER E','"
+  # echo "Contract data successfully uploaded to the GreenplumpDB for block range $((start_block_height))-$((end_block_height))"
+  # psql -h "$GREENPLUM_HOST" -p "$GREENPLUM_SERVICE_PORT" -d "$GREENPLUM_DB" --user=$GREENPLUM_USERNAME -c "\\COPY eth_token(address,symbol,name,decimals,total_supply,block_number) FROM tokens.csv CSV DELIMITER E','"
+  # echo "Tokens data successfully uploaded to the GreenplumpDB for block range $((start_block_height))-$((end_block_height))"
 
   echo "$((end_block_height))" > data/last_processed_number-$initial_start_block-$END_BLOCK_HEIGHT.txt
 }
