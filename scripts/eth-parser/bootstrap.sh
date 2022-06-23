@@ -63,7 +63,7 @@ export_traces() {
 
 export_data() {
   local end_block_height=$1
-  
+
   sed -i '1d' blocks.csv
   sed -i '1d' transactions.csv
   sed -i '1d' token_transfers.csv
@@ -130,9 +130,11 @@ while sleep 1; do
         export_data $((end_block_height))
         purge_csv
         export start_block_height=$((end_block_height))
-    elif ((end_block_height == start_block_height)); then
+    elif ((end_block_height == start_block_height)) && ((initial_start_block > 14000000)); then
         printf "Current date and time in Linux %s\n" "$(date)"
         echo "Parsing completed for the given upper bound block height - $((end_block_height))"
+    else
+       break
     fi
 done
 

@@ -70,7 +70,7 @@ env_vars_5 = {
     'END_BLOCK_HEIGHT' : '16000000',
     'BATCH_SIZE': '10000',
     'ETHEREUM_CLIENT_HOST': '10.4.8.131',
-    'ETHEREUM_CLIENT_PORT': '31393'
+    'ETHEREUM_CLIENT_PORT': '31389'
 }
 
 with models.DAG(
