@@ -80,10 +80,10 @@ with models.DAG(
 
     task_parser_1 = KubernetesPodOperator(
         namespace='default',
-        name="eth_parsing_task_6320000-8000000",
+        name="eth_parsing_task_6000000-8000000",
         image='toshiqcri/eth-etl-parser:latest',
         image_pull_policy='Always',
-        task_id="eth_parsing_task_6320000-8000000",
+        task_id="eth_parsing_task_6000000-8000000",
         do_xcom_push=False,
         volumes=[volume],
         volume_mounts=[volume_mount],
