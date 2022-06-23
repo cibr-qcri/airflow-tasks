@@ -197,7 +197,7 @@ env_vars_6 = {
 
 env_vars_7 = {
     'START_BLOCK_HEIGHT' : '700000',
-    'END_BLOCK_HEIGHT' : '750000',
+    'END_BLOCK_HEIGHT' : '741900',
     'BATCH_SIZE': '5000',
     'BITCOIN_DAEMON_HOST': '10.4.8.146',
     'BITCOIN_DAEMON_PORT': '30239'
