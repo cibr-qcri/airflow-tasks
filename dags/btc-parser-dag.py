@@ -158,7 +158,7 @@ affinity_6 = {
 env_vars_2 = {
     'START_BLOCK_HEIGHT' : '200000',
     'END_BLOCK_HEIGHT' : '300000',
-    'BATCH_SIZE': '10000',
+    'BATCH_SIZE': '1000',
     'BITCOIN_DAEMON_HOST': '10.4.8.146',
     'BITCOIN_DAEMON_PORT': '30234'
 }
@@ -166,7 +166,7 @@ env_vars_2 = {
 env_vars_3 = {
     'START_BLOCK_HEIGHT' : '300000',
     'END_BLOCK_HEIGHT' : '400000',
-    'BATCH_SIZE': '10000',
+    'BATCH_SIZE': '1000',
     'BITCOIN_DAEMON_HOST': '10.4.8.146',
     'BITCOIN_DAEMON_PORT': '30235'
 }
@@ -182,7 +182,7 @@ env_vars_4 = {
 env_vars_5 = {
     'START_BLOCK_HEIGHT' : '500000',
     'END_BLOCK_HEIGHT' : '600000',
-    'BATCH_SIZE': '10000',
+    'BATCH_SIZE': '1000',
     'BITCOIN_DAEMON_HOST': '10.4.8.146',
     'BITCOIN_DAEMON_PORT': '30237'
 }
@@ -190,7 +190,7 @@ env_vars_5 = {
 env_vars_6 = {
     'START_BLOCK_HEIGHT' : '600000',
     'END_BLOCK_HEIGHT' : '700000',
-    'BATCH_SIZE': '10000',
+    'BATCH_SIZE': '1000',
     'BITCOIN_DAEMON_HOST': '10.4.8.146',
     'BITCOIN_DAEMON_PORT': '30238'
 }
@@ -198,7 +198,7 @@ env_vars_6 = {
 env_vars_7 = {
     'START_BLOCK_HEIGHT' : '700000',
     'END_BLOCK_HEIGHT' : '741900',
-    'BATCH_SIZE': '5000',
+    'BATCH_SIZE': '1000',
     'BITCOIN_DAEMON_HOST': '10.4.8.146',
     'BITCOIN_DAEMON_PORT': '30239'
 }
