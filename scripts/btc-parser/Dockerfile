@@ -52,7 +52,7 @@ COPY dependencies/btc_blockchain_schema.sql ./btc_blockchain_schema.sql
 
 RUN pip3 install bitcoin-etl python-arango
 
-RUN chmod 755 ./eth-bootstrap.py.sh
+RUN chmod 755 ./bootstrap.sh
 RUN chmod 755 ./blockchain-parser.py
 RUN chmod 755 ./btc_blockchain_schema.sql
 
