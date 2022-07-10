@@ -1,5 +1,7 @@
 CREATE DATABASE eth_blockchain;
+
 \c eth_blockchain;
+
 CREATE TABLE IF NOT EXISTS eth_block (
   id SERIAL primary key NOT NULL,
   number bigint,
@@ -22,6 +24,7 @@ CREATE TABLE IF NOT EXISTS eth_block (
   transaction_count bigint,
   base_fee_per_gas bigint
 );
+
 CREATE TABLE IF NOT EXISTS eth_transaction (
   id SERIAL primary key NOT NULL,
   hash varchar(256),
@@ -40,6 +43,7 @@ CREATE TABLE IF NOT EXISTS eth_transaction (
   max_priority_fee_per_gas bigint,
   transaction_type bigint
 );
+
 CREATE TABLE IF NOT EXISTS eth_token_transfer (
   id SERIAL primary key NOT NULL,
   token_address varchar(256),
@@ -50,6 +54,7 @@ CREATE TABLE IF NOT EXISTS eth_token_transfer (
   log_index bigint,
   block_number bigint
 );
+
 CREATE TABLE IF NOT EXISTS eth_receipt (
   id SERIAL primary key NOT NULL,
   transaction_hash varchar(256),
@@ -74,6 +79,7 @@ CREATE TABLE IF NOT EXISTS eth_log (
   data text,
   topics text
 );
+
 CREATE TABLE IF NOT EXISTS eth_contract (
   id SERIAL primary key NOT NULL,
   address varchar(256),
@@ -83,6 +89,7 @@ CREATE TABLE IF NOT EXISTS eth_contract (
   is_erc721 boolean,
   block_number bigint
 );
+
 CREATE TABLE IF NOT EXISTS eth_token (
   id SERIAL primary key NOT NULL,
   address varchar(256),
@@ -92,6 +99,7 @@ CREATE TABLE IF NOT EXISTS eth_token (
   total_supply numeric,
   block_number bigint
 );
+
 CREATE TABLE IF NOT EXISTS eth_trace (
   id SERIAL primary key NOT NULL,
   block_number bigint,
@@ -113,6 +121,7 @@ CREATE TABLE IF NOT EXISTS eth_trace (
   status bigint,
   trace_id text
 );
+
 CREATE TABLE IF NOT EXISTS eth_defi_data_provider (
   id varchar primary key NOT NULL,
   symbol varchar,
@@ -127,6 +136,7 @@ CREATE TABLE IF NOT EXISTS eth_defi_data_provider (
   category varchar NULL,
   chains varchar array NULL
 );
+
 CREATE TABLE IF NOT EXISTS eth_defi_protocol (
   gecko_id VARCHAR PRIMARY KEY NOT NULL,
   symbol VARCHAR,
@@ -136,6 +146,7 @@ CREATE TABLE IF NOT EXISTS eth_defi_protocol (
   description TEXT,
   contract VARCHAR
 );
+
 CREATE TABLE IF NOT EXISTS eth_defi_scan_result (
   symbol VARCHAR,
   name VARCHAR,
